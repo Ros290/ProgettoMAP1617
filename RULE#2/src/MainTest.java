@@ -22,7 +22,7 @@ public class MainTest {
 			int j=1;
 			while(!outputAR.endList(q)){
 				AssociationRule AR=(AssociationRule)outputAR.readList(q);
-				System.out.println("--"+i+"."+j+":"+AR);
+					System.out.println("--"+i+"."+j+":"+AR+"\n");
 				j++;
 				q=outputAR.succ(q);
 			}

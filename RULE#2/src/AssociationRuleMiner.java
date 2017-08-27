@@ -6,7 +6,7 @@
 	public static LinkList confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf)	
 	{
 		LinkList outputAR = new LinkList();
-		for (int i=0; i < fp.getPatternLength(); i++)
+		for (int i=1; i < fp.getPatternLength(); i++)
 		{
 			AssociationRule AR = confidentAssociationRuleDiscovery(data,fp,minConf,i);
 			if (AR.getConfidence() >= minConf)
