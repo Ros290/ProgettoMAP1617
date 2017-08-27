@@ -34,24 +34,27 @@ public class FrequentPatternMiner
 	
 	private static   LinkList expandFrequentPatterns(Data data, float minSup, 	Queue fpQueue,LinkList outputFP)
 	{
-		while (!fpQueue.isEmpty())
+		while ((!fpQueue.isEmpty())&&(((FrequentPattern) fpQueue.first()).getPatternLength()<=3))
 		{
 			FrequentPattern fp = (FrequentPattern) fpQueue.first();
-			FrequentPattern newfp;
 			fpQueue.dequeue();
 			int i,j;
 			int k = fp.getPatternLength();
 			for (i=0; i<data.getNumberOfAttributes(); i++)
 			{
 				for (j=0; j<k; j++)
-					if (((DiscreteAttribute)data.getAttribute(i)).equals(((DiscreteItem)fp.getItem(k)).getAttribute()))
+				{
+					DiscreteAttribute da_temp = ((DiscreteAttribute)data.getAttribute(i));
+					DiscreteAttribute da_patt = (DiscreteAttribute)((DiscreteItem)fp.getItem(j)).getAttribute();
+					if (da_temp.equals(da_patt))
 						break;
+				}
 				if (j==k)
 				{
 					DiscreteAttribute da = ((DiscreteAttribute)data.getAttribute(i));
 					for (j=0; j<da.getNumberOfDistinctValues(); j++)
 					{
-						newfp = refineFrequentPattern(fp,new DiscreteItem(da,da.getValue(j)));
+						FrequentPattern newfp = refineFrequentPattern(fp,new DiscreteItem(da,da.getValue(j)));
 						newfp.setSupport(FrequentPatternMiner.computeSupport(data, newfp));
 						if(newfp.getSupport()>=minSup)
 						{ // 1-FP CANDIDATE
@@ -97,7 +100,9 @@ public class FrequentPatternMiner
 	
 	static FrequentPattern refineFrequentPattern(FrequentPattern FP, Item item)
 	{
-		FrequentPattern newfp = FP;
+		FrequentPattern newfp = new FrequentPattern();
+		for (int i=0; i<FP.getPatternLength(); i++)
+			newfp.addItem(FP.getItem(i));
 		newfp.addItem(item);
 		return newfp;
 	}

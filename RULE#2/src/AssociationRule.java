@@ -34,13 +34,16 @@ public class AssociationRule
 	void addAntecedentItem (Item item)
 	{
 		Item temp [] = antecedent.clone();
-		antecedent= new Item [temp.length+1];
+		antecedent = new Item [temp.length+1];
 		int i = -1;
 		for (Item it : temp)
 		{
-			antecedent[i++] = it;
+			i++;
+			antecedent[i] = it;
 		}
-		antecedent[i++] = item;
+		int l = antecedent.length;
+		i++;
+		antecedent[i] = item;
 	}
 	
 	
@@ -50,8 +53,12 @@ public class AssociationRule
 		consequent= new Item [temp.length+1];
 		int i = -1;
 		for (Item it : temp)
-			consequent[i++] = it;
-		consequent[i++] = item;
+		{
+			i++;
+			consequent[i] = it;
+		}
+		i++;
+		consequent[i] = item;
 	}
 	
 	Item getConsequentItem (int index)

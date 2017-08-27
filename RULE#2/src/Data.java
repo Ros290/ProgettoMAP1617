@@ -61,9 +61,9 @@ public class Data
         data[8][4] = "Yes";
         data[9][0] = "Rain";
         data[9][1] = "Mild";
-        data[9][2] = "High";
+        data[9][2] = "Normal";
         data[9][3] = "Weak";
-        data[9][4] = "No";
+        data[9][4] = "Yes";
         data[10][0] = "Sunny";
         data[10][1] = "Mild";
         data[10][2] = "Normal";
@@ -98,7 +98,7 @@ public class Data
 		String outLookValues[] = {"Sunny", "Overcast", "Rain"};
 		attributeSet[0] = new DiscreteAttribute("Outlook", 0, outLookValues);
 		
-		String temperatureValues[] = {"Hot", "Mid", "Cold"};
+		String temperatureValues[] = {"Hot", "Mild", "Cold"};
 		attributeSet[1] = new DiscreteAttribute("Temperature", 1, temperatureValues);
 		
 		String humidityValues[] = {"Hight", "Normal"};
@@ -147,14 +147,6 @@ public class Data
 			string += "\n";
 		}
 		return string;
-	}
-
-
-	
-	public static void main(String args[])
-	{
-		Data trainingSet=new Data();
-		System.out.println(trainingSet);
 	}
 
 }
