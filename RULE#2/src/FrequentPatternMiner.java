@@ -3,6 +3,13 @@
 public class FrequentPatternMiner 
 {
 
+	/**
+	 * Ricava tutti i pattern frequenti all'interno della collezioni. 
+	 * I pattern frequenti ricavati avranno supporto pari o maggiore al valore indicato nei parametri
+	 * @param data collezione di dati da cui ricavare i pattern
+	 * @param minSup valore "minimo" di supporto per i pattern frequenti ricavati
+	 * @return Pattern frequenti
+	 */
 	static LinkList frequentPatternDiscovery(Data data,float minSup)
 	{
 		Queue fpQueue=new Queue();		
@@ -32,6 +39,15 @@ public class FrequentPatternMiner
 		return outputFP;
 	}
 	
+	/**
+	 * è un'"estensione" della funzione frequentPatternDiscovery, con la sola differenza che opera su pattern 
+	 * di lunghezza >1 . Per il resto, lo scopo della funzione è il medesimo di frequentPatternDiscovery
+	 * @param data collezione di dati da cui ricavare i pattern
+	 * @param minSup valore "minimo" di supporto per i pattern frequenti ricavati
+	 * @param fpQueue coda dei pattern frequenti di lunghezza 1
+	 * @param outputFP Lista dei pattern frequenti
+	 * @return Lista completa dei pattern frequenti ricavati
+	 */
 	private static   LinkList expandFrequentPatterns(Data data, float minSup, 	Queue fpQueue,LinkList outputFP)
 	{
 		while ((!fpQueue.isEmpty())&&(((FrequentPattern) fpQueue.first()).getPatternLength()<=3))
@@ -69,7 +85,12 @@ public class FrequentPatternMiner
 		return outputFP;
 	}
 	
-	// Aggiorna il supporto
+	/**
+	 * Tramite la collezione di dati, ricava il valore di supporto relativo al pattern
+	 * @param data collezione di dati
+	 * @param FP pattern 
+	 * @return il valore di supporto relativo al pattern
+	 */
 	static float computeSupport(Data data,FrequentPattern FP)
 	{
 		int suppCount=0;
@@ -98,6 +119,13 @@ public class FrequentPatternMiner
 		
 	}
 	
+	/**
+	 * Mantenendo invariando lo stato del pattern passato come argomento, la funzione restitutisce un nuovo
+	 * pattern, contenente i valori del pattern in argomento, in aggiunta all'item passato come argomento
+	 * @param FP pattern da cui verrano copiati i suoi item al nuovo pattern
+	 * @param item item da aggiungere al nuovo pattern
+	 * @return pattern con gli item di FP più l'item nel parametro
+	 */
 	static FrequentPattern refineFrequentPattern(FrequentPattern FP, Item item)
 	{
 		FrequentPattern newfp = new FrequentPattern();

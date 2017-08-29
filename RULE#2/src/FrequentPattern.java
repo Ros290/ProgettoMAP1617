@@ -5,12 +5,18 @@ public class FrequentPattern
 	private Item fp[];
 	private float support;
 	
-	
+	/**
+	 * Costruttore
+	 */
 	FrequentPattern()
 	{
 		fp=new Item[0];
 	}
-	//aggiunge un nuovo item al pattern
+
+	/**
+	 * Aggiunge un nuovo item al pattern
+	 * @param item item da aggiungere
+	 */
 	void addItem(Item item)
 	{
 		int length =fp.length;
@@ -21,21 +27,38 @@ public class FrequentPattern
 		fp=temp;
 	}
 	
+	/**
+	 * 
+	 * @return ritorna il numero di item compresi nel pattern
+	 */
 	int getPatternLength ()
 	{
 		return fp.length;
 	}
 	
+	/**
+	 * 
+	 * @param index posizione dell'item all'interno del pattern
+	 * @return l'item in posizione index
+	 */
 	Item getItem (int index)
 	{
 		return fp[index];
 	}
 	
+	/**
+	 * 
+	 * @return ritorna il valore di supporto relativo al pattern
+	 */
 	float getSupport ()
 	{
 		return support;
 	}
 	
+	/**
+	 * 
+	 * @param support valore di support da assegnare al pattern
+	 */
 	void setSupport (float support)
 	{
 		this.support = support;

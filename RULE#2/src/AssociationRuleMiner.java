@@ -2,7 +2,13 @@
 
  public class AssociationRuleMiner {
 		
-	
+	/** In base ad un pattern frequente, analizzando una collezione di dati, genera le regole d'associazione
+	 * ad esso associate, confrontandole con il valore confidente desiderato
+	 * @param data collezione di dati su cui operare
+	 * @param fp pattern frequente da cui generare le regole d'associazione
+	 * @param minConf valore confidente, per definire quali regole d'associazione possano essere valide
+	 * @return lista di regole d'associazione relative al pattern passato come argomento
+	 */
 	public static LinkList confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf)	
 	{
 		LinkList outputAR = new LinkList();
@@ -15,7 +21,15 @@
 		return outputAR;
 	}
 
-
+	/**
+	 * A partire dal pattern frequente, genera una regola d'associazione, suddividendo i valori "antecedenti" e
+	 * quelli "consequenti" in base al valore di iCut, ricavando la confidenza della suddetta.
+	 * @param data collezione di dati su cui operare
+	 * @param fp pattern frequente da cui generare le regole d'associazione
+	 * @param minConf valore confidente, per definire quali regole d'associazione possano essere valide
+	 * @param iCut indica a quale punto del pattern termina la parte "antecedente" e comincia quella "consequente
+	 * @return regola d'associazione generata
+	 */
 	private static AssociationRule confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf, int iCut)
 	{
 		AssociationRule AR=new AssociationRule(fp.getSupport());
@@ -33,8 +47,13 @@
 		return AR;
 }
 
-//Aggiorna il supporto
-static float  computeConfidence(Data data, AssociationRule AR)
+/**
+ * Valuta la confidenza della regola d'associazione in base alla collezione di dati
+ * @param data collezione di dati su cui operare
+ * @param AR regola d'associazione da cui generare la relativa confidenza
+ * @return confidenza della regola d'associazione passata come parametro 
+ */
+private static float  computeConfidence(Data data, AssociationRule AR)
 {
 	int antCount = 0;
 	int assCount = 0;

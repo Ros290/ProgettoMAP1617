@@ -111,23 +111,41 @@ public class Data
 		attributeSet[4] = new DiscreteAttribute("PlayTennis", 4, playTennisValues);
 	}
 	
+	/**
+	 * 
+	 * @return Ritorna il numero di esempi riportati nella collezione 
+	 */
 	public int getNumberOfExamples()
 	{
 		return this.numberOfExamples;
 	}
 	
+	/**
+	 * 
+	 * @return Ritorna il numero di attributi che compongono gli esempi nella collezione
+	 */
 	public int getNumberOfAttributes()
 	{
 		return this.attributeSet.length;
 	}
 	
 	
-	
+	/**
+	 * 
+	 * @param exampleIndex posizione dell'esempio
+	 * @param attributeIndex indice relativo all'attributo
+	 * @return il valore del relativo attributo riportato nel relativo esempio
+	 */
 	public Object getAttributeValue(int exampleIndex, int attributeIndex)
 	{
 		return this.data[exampleIndex][attributeIndex];
 	}
 	
+	/**
+	 * 
+	 * @param index indice relativo all'attributo desiderato
+	 * @return l'attributo richiesto
+	 */
 	public Attribute getAttribute(int index)
 	{
 		return this.attributeSet[index];
