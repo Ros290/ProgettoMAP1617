@@ -1,20 +1,20 @@
 package utility;
 
-public class Queue 
+public class Queue<T>
 {
 
-		private Record begin = null;
+		private Record<T> begin = null;
 
-		private Record end = null;
+		private Record<T> end = null;
 		
-		private class Record 
+		private class Record<T>
 		{
 
-	 		public Object elem;
+	 		public T elem;
 
-	 		public Record next;
+	 		public Record<T> next;
 
-			public Record(Object e) 
+			public Record (T e) 
 			{
 				this.elem = e; 
 				this.next = null;
@@ -27,13 +27,13 @@ public class Queue
 			return this.begin == null;
 		}
 
-		public void enqueue(Object e) 
+		public void enqueue(T e) 
 		{
 			if (this.isEmpty())
-				this.begin = this.end = new Record(e);
+				this.begin = this.end = new Record<T>(e);
 			else 
 			{
-				this.end.next = new Record(e);
+				this.end.next = new Record<T>(e);
 				this.end = this.end.next;
 			}
 		}

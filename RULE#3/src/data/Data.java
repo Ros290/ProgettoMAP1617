@@ -1,12 +1,16 @@
 package data;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class Data 
 {
 	
 	 private Object data [][];
 	 private int numberOfExamples;
-	 private Attribute attributeSet[];
+	 private List<Attribute> attributeSet = new LinkedList <Attribute>();
 	
 	
 	public Data()
@@ -87,30 +91,23 @@ public class Data
         data[13][3] = "Strong";
         data[13][4] = "No";
         
-         
-		// numberOfExamples
-		
 		 numberOfExamples=14;		 
 		 
-		
-		//explanatory Set
-		
-		attributeSet = new Attribute[5];
-		
-		String outLookValues[] = {"Sunny", "Overcast", "Rain"};
-		attributeSet[0] = new DiscreteAttribute("Outlook", 0, outLookValues);
-		
-		String temperatureValues[] = {"Hot", "Mild", "Cool"};
-		attributeSet[1] = new DiscreteAttribute("Temperature", 1, temperatureValues);
-		
-		String humidityValues[] = {"High", "Normal"};
-		attributeSet[2] = new DiscreteAttribute("Humidity", 2, humidityValues);
-		
-		String windValues[] = {"Weak", "Strong"};
-		attributeSet[3] = new DiscreteAttribute("Wind", 3, windValues);
-		
-		String playTennisValues[] = {"No", "Yes"};
-		attributeSet[4] = new DiscreteAttribute("PlayTennis", 4, playTennisValues);
+		 String outLookValues[] = {"Sunny", "Overcast", "Rain"};
+		 attributeSet.add(new DiscreteAttribute("Outlook", 0, outLookValues));
+		 
+		 String temperatureValues[] = {"Hot", "Mild", "Cool"};;
+		 attributeSet.add(new DiscreteAttribute("Temperature", 1, temperatureValues));
+		 
+		 String humidityValues[] = {"High", "Normal"};
+		 attributeSet.add(new DiscreteAttribute("Humidity", 2, humidityValues));
+		 
+		 String windValues[] = {"Weak", "Strong"};
+		 attributeSet.add(new DiscreteAttribute("Wind", 3, windValues));
+		 
+		 String playTennisValues[] = {"No", "Yes"};
+		 attributeSet.add(new DiscreteAttribute("PlayTennis", 4, playTennisValues));
+
 	}
 	
 	/**
@@ -128,7 +125,7 @@ public class Data
 	 */
 	public int getNumberOfAttributes()
 	{
-		return this.attributeSet.length;
+		return this.attributeSet.size();
 	}
 	
 	
@@ -147,10 +144,18 @@ public class Data
 	 * 
 	 * @param index indice relativo all'attributo desiderato
 	 * @return l'attributo richiesto
+	 * @exception EmptySetException
 	 */
-	public Attribute getAttribute(int index)
+	public Attribute getAttribute(int index) throws EmptySetException
 	{
-		return this.attributeSet[index];
+		Iterator it = attributeSet.listIterator();
+		while (it.hasNext())
+		{
+			DiscreteAttribute da = (DiscreteAttribute) it.next();
+			if (da.getIndex() == index)
+				return da;
+		}
+		throw new EmptySetException ("Nessun attributo con indice "+index+"\n");
 	}
 	
 	
@@ -160,7 +165,7 @@ public class Data
 		for (int i = 0; i < this.numberOfExamples; i++)
 		{
 			string += (i+1) +":";
-			for (int j = 0; j < this.attributeSet.length; j++)
+			for (int j = 0; j < this.attributeSet.size(); j++)
 			{
 				string += data[i][j].toString() + ",";
 			}

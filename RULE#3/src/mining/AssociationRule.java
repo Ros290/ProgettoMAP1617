@@ -1,7 +1,7 @@
 package mining;
 
 
-public class AssociationRule 
+public class AssociationRule implements Comparable<AssociationRule>
 {
 	private Item antecedent [] = new Item [0];
 	private Item consequent [] = new Item [0];
@@ -12,7 +12,7 @@ public class AssociationRule
 	 * Costruttore della classe 
 	 * @param support valore di supporto
 	 */
-	AssociationRule (float support)
+	public AssociationRule (float support)
 	{
 		this.support = support;
 	}
@@ -20,7 +20,7 @@ public class AssociationRule
 	/**
 	 * @return valore di supporto
 	 */
-	float getSupport()
+	public float getSupport()
 	{
 		return this.support;
 	}
@@ -29,7 +29,7 @@ public class AssociationRule
 	 * 
 	 * @return valore di confidenza
 	 */
-	float getConfidence()
+	public float getConfidence()
 	{
 		return this.confidence;
 	}
@@ -38,7 +38,7 @@ public class AssociationRule
 	 * 
 	 * @return numero di item nella parte "antecedente"
 	 */
-	int getAntecedentLenght ()
+	public int getAntecedentLenght ()
 	{
 		return antecedent.length;
 	}
@@ -47,7 +47,7 @@ public class AssociationRule
 	 * 
 	 * @return numero di item nella parte "consequente"
 	 */
-	int getConsequentLenght()
+	public int getConsequentLenght()
 	{
 		return this.consequent.length;
 	}
@@ -56,7 +56,7 @@ public class AssociationRule
 	 * Aggiunge un item nella parte antecedente 
 	 * @param item item da aggiungere 
 	 */
-	void addAntecedentItem (Item item)
+	public void addAntecedentItem (Item item)
 	{
 		Item temp [] = antecedent.clone();
 		antecedent = new Item [temp.length+1];
@@ -75,7 +75,7 @@ public class AssociationRule
 	 * Aggiunge un item nella parte consequente
 	 * @param item item da aggiungere
 	 */
-	void addConsequentItem (Item item)
+	public void addConsequentItem (Item item)
 	{
 		Item temp [] = consequent.clone();
 		consequent= new Item [temp.length+1];
@@ -94,7 +94,7 @@ public class AssociationRule
 	 * @param index indice relativo alla posizione dell'item desiderato
 	 * @return item in posizione index 
 	 */
-	Item getConsequentItem (int index)
+	public Item getConsequentItem (int index)
 	{
 		return consequent[index];
 	}
@@ -104,14 +104,19 @@ public class AssociationRule
 	 * @param index indice relativo alla posizione dell'item desiderato
 	 * @return item in posizione index 
 	 */
-	Item getAntecedentItem (int index)
+	public Item getAntecedentItem (int index)
 	{
 		return antecedent[index];
 	}
 	
-	void setConfidence (float confedence)
+	public void setConfidence (float confedence)
 	{
 		this.confidence = confedence;
+	}
+	
+	public int compareTo(AssociationRule AR)
+	{
+		return (this.confidence != AR.getConfidence()) == true ? 1 : -1;
 	}
 	
 	public String toString()

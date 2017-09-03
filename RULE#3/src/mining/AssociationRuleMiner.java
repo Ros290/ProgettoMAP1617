@@ -1,4 +1,7 @@
 package mining;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import utility.LinkList;
 import data.Data;
 import data.DiscreteAttribute;
@@ -14,18 +17,21 @@ import data.DiscreteAttribute;
 	 * @param minConf valore confidente, per definire quali regole d'associazione possano essere valide
 	 * @return lista di regole d'associazione relative al pattern passato come argomento
 	 * @throws OneLevelPatternException 
+	 * @throws NoPatternException 
 	 */
-	public static LinkList confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf) throws OneLevelPatternException	
+	public static LinkedList<AssociationRule> confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf) throws OneLevelPatternException, NoPatternException	
 	{
 		if (fp.getPatternLength()==1)
 			throw new OneLevelPatternException("Il pattern '"+fp.toString()+"' ha lunghezza 1\n");
-		LinkList outputAR = new LinkList();
+		LinkedList<AssociationRule> outputAR = new LinkedList<AssociationRule>();
 		for (int i=1; i < fp.getPatternLength(); i++)
 		{
 			AssociationRule AR = confidentAssociationRuleDiscovery(data,fp,minConf,i);
 			if (AR.getConfidence() >= minConf)
 				outputAR.add(AR);
 		}
+		if (outputAR.isEmpty())
+			throw new NoPatternException("Il pattern '"+fp.toString()+"' non ha generato regole confidenti");
 		return outputAR;
 	}
 
@@ -45,14 +51,12 @@ import data.DiscreteAttribute;
 		AssociationRule AR=new AssociationRule(fp.getSupport());
 	
 		//to generate the antecedent of the association rule
+		Iterator<Item> it= fp.iterator();
 		for(int j=0;j<iCut;j++)
-		{
-			AR.addAntecedentItem(fp.getItem(j));		
-		}
+			AR.addAntecedentItem(it.next());		
 		//to generate the consequent of the association rule
-		for(int j=iCut;j<fp.getPatternLength();j++){
-			AR.addConsequentItem(fp.getItem(j));
-		}	
+		while(it.hasNext())
+			AR.addConsequentItem(it.next());
 		AR.setConfidence(AssociationRuleMiner.computeConfidence(data,AR));
 		return AR;
 }

@@ -1,4 +1,7 @@
 package mining;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import utility.EmptyQueueException;
 import utility.LinkList;
 import utility.Queue;
@@ -20,12 +23,12 @@ public class FrequentPatternMiner
 	 * @return Pattern frequenti
 	 * @exception EmptySetException
 	 */
-	public static LinkList frequentPatternDiscovery(Data data,float minSup) throws EmptySetException
+	public static LinkedList<FrequentPattern> frequentPatternDiscovery(Data data,float minSup) throws EmptySetException
 	{
 		if (data.getNumberOfExamples() == 0)
 			throw new EmptySetException("Errore, impossibile ricavare i pattern frequenti. La collezione di dati risulta vuota.\n");
-		Queue fpQueue=new Queue();		
-		LinkList outputFP=new LinkList();
+		Queue<FrequentPattern> fpQueue=new Queue<FrequentPattern>();		
+		LinkedList<FrequentPattern>outputFP=new LinkedList<FrequentPattern>();
 		for(int i=0;i<data.getNumberOfAttributes();i++)
 		{
 			Attribute currentAttribute=data.getAttribute(i);
@@ -47,7 +50,7 @@ public class FrequentPatternMiner
 			}
 			
 		}
-		outputFP=expandFrequentPatterns(data,minSup,fpQueue,outputFP);
+		outputFP.addAll(expandFrequentPatterns(data,minSup,fpQueue,outputFP));
 		return outputFP;
 	}
 	
@@ -59,8 +62,9 @@ public class FrequentPatternMiner
 	 * @param fpQueue coda dei pattern frequenti di lunghezza 1
 	 * @param outputFP Lista dei pattern frequenti
 	 * @return Lista completa dei pattern frequenti ricavati
+	 * @throws EmptySetException 
 	 */
-	private static   LinkList expandFrequentPatterns(Data data, float minSup, 	Queue fpQueue,LinkList outputFP)
+	private static   LinkedList<FrequentPattern> expandFrequentPatterns(Data data, float minSup, 	Queue<FrequentPattern> fpQueue,LinkedList<FrequentPattern> outputFP) throws EmptySetException
 	{			
 		try
 		{
@@ -68,19 +72,25 @@ public class FrequentPatternMiner
 		{
 
 			FrequentPattern fp = (FrequentPattern) fpQueue.first();
+			
 			fpQueue.dequeue();
 			int i,j;
 			int k = fp.getPatternLength();
 			for (i=0; i<data.getNumberOfAttributes(); i++)
 			{
-				for (j=0; j<k; j++)
+				Iterator<Item> it = fp.iterator();
+				j=0;
+				while (it.hasNext())
 				{
+					
 					DiscreteAttribute da_temp = ((DiscreteAttribute)data.getAttribute(i));
-					DiscreteAttribute da_patt = (DiscreteAttribute)((DiscreteItem)fp.getItem(j)).getAttribute();
+					//DiscreteAttribute da_patt = (DiscreteAttribute)((DiscreteItem)fp.getNext(j)).getAttribute();
+					DiscreteAttribute da_patt = (DiscreteAttribute)((DiscreteItem)it.next()).getAttribute();
 					if (da_temp.equals(da_patt))
 						break;
+					j++;
 				}
-				if (j==k)
+				if (j==fp.getPatternLength())
 				{
 					DiscreteAttribute da = ((DiscreteAttribute)data.getAttribute(i));
 					for (j=0; j<da.getNumberOfDistinctValues(); j++)
@@ -120,10 +130,11 @@ public class FrequentPatternMiner
 		{
 			//indice item
 			boolean isSupporting=true;
-			for(int j=0;j<FP.getPatternLength();j++)
+			Iterator<Item> it = FP.iterator();
+			while (it.hasNext())
 			{
 				//DiscreteItem
-				DiscreteItem item=(DiscreteItem)FP.getItem(j);
+				DiscreteItem item = (DiscreteItem)it.next();
 				DiscreteAttribute attribute=(DiscreteAttribute)item.getAttribute();
 				//Extract the example value
 				Object valueInExample=data.getAttributeValue(i, attribute.getIndex());
@@ -150,8 +161,9 @@ public class FrequentPatternMiner
 	private static FrequentPattern refineFrequentPattern(FrequentPattern FP, Item item)
 	{
 		FrequentPattern newfp = new FrequentPattern();
-		for (int i=0; i<FP.getPatternLength(); i++)
-			newfp.addItem(FP.getItem(i));
+		Iterator<Item> it = FP.iterator();
+		while (it.hasNext())
+			newfp.addItem(it.next());
 		newfp.addItem(item);
 		return newfp;
 	}

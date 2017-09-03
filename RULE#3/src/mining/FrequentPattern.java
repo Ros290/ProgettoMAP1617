@@ -1,10 +1,16 @@
 package mining;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+
 
 public class FrequentPattern 
 {
 
-	private Item fp[];
+	//private Item fp[];
+	private List <Item> fp ;
 	private float support;
 	
 	/**
@@ -12,7 +18,7 @@ public class FrequentPattern
 	 */
 	FrequentPattern()
 	{
-		fp=new Item[0];
+		fp = new LinkedList<Item>();
 	}
 
 	/**
@@ -21,12 +27,7 @@ public class FrequentPattern
 	 */
 	void addItem(Item item)
 	{
-		int length =fp.length;
-		
-		Item temp []=new Item[length+1];
-		System.arraycopy(fp, 0, temp, 0, length);
-		temp [length]=item;
-		fp=temp;
+		fp.add(item);
 	}
 	
 	/**
@@ -35,18 +36,25 @@ public class FrequentPattern
 	 */
 	int getPatternLength ()
 	{
-		return fp.length;
+		return fp.size();
 	}
 	
+	public Iterator<Item> iterator()
+	{
+		return fp.iterator();
+	}
 	/**
 	 * 
 	 * @param index posizione dell'item all'interno del pattern
 	 * @return l'item in posizione index
 	 */
-	Item getItem (int index)
+	/*
+	Item getNext (int index)
 	{
-		return fp[index];
+		return (Item)it.next();
+		//return fp[index];
 	}
+	*/
 	
 	/**
 	 * 
@@ -68,16 +76,17 @@ public class FrequentPattern
 	
 	public String toString()
 	{
+		Iterator<Item> it = fp.iterator();
 		String value="";
-		for(int i=0;i<fp.length-1;i++)
-			value+=fp[i] +" AND ";
-		if(fp.length>0){
-			value+=fp[fp.length-1];
+		for(int i=0;i<fp.size()-1;i++)
+			value+=it.next().toString() +" AND ";
+		if(fp.size()>0)
+		{
+			value+=it.next().toString();
 			value+="["+support+"]";
 		}
 		
 		return value;
 	}
-
 
 }
