@@ -17,7 +17,7 @@ public class AssociationRuleArchieve
 	
 	public AssociationRuleArchieve()
 	{
-		archive = new HashMap<>();
+		archive = new LinkedHashMap<FrequentPattern, TreeSet<AssociationRule>>();
 	}
 	
 	public void put(FrequentPattern fp)
@@ -25,9 +25,10 @@ public class AssociationRuleArchieve
 		archive.put(fp, null);
 	}
 	
-	public void put(FrequentPattern fp, AssociationRule rule)
+	public void put(FrequentPattern fp, TreeSet<AssociationRule> rule)
 	{
-		archive.put(fp,new TreeSet<AssociationRule>((Arrays.asList(rule))));
+
+		archive.put(fp,rule);
 	}
 	
 	public TreeSet<AssociationRule> getRules (FrequentPattern fp) throws NoPatternException

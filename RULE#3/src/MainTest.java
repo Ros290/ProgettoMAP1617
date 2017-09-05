@@ -1,5 +1,6 @@
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.TreeSet;
 
 import keyboardinput.Keyboard;
 import mining.AssociationRule;
@@ -50,9 +51,12 @@ public class MainTest {
 				try {
 					outputAR = AssociationRuleMiner.confidentAssociationRuleDiscovery(data,FP,minConf);
 					Iterator<AssociationRule> itRule=outputAR.iterator();
-					while(itRule.hasNext()){
-						archive.put(FP,itRule.next());
+					TreeSet<AssociationRule> tree= new TreeSet<AssociationRule>();
+					while(itRule.hasNext())
+					{
+						tree.add(itRule.next());
 					}
+					archive.put(FP,tree);
 									
 				
 				} catch (OneLevelPatternException | NoPatternException e) {

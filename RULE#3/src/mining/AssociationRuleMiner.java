@@ -69,12 +69,15 @@ import data.DiscreteAttribute;
  */
 private static float  computeConfidence(Data data, AssociationRule AR)
 {
-	int antCount = 0;
-	int assCount = 0;
+	int totAntCount = 0;
+	int totAssCount = 0;
+	int antCount, assCount;
 	// indice esempio
 	for(int i=0;i<data.getNumberOfExamples();i++)
 	{
 		//indice item
+		antCount = 0;
+		assCount = 0;
 		boolean isSupporting=true;
 		for(int j=0;j<AR.getAntecedentLenght();j++)
 		{
@@ -92,7 +95,8 @@ private static float  computeConfidence(Data data, AssociationRule AR)
 		}
 		if(isSupporting)
 			antCount++;
-		assCount = antCount;
+		//isSupporting = true;
+		//assCount = antCount;
 		for(int j=0;j<AR.getConsequentLenght();j++)
 		{
 			//DiscreteItem
@@ -109,8 +113,10 @@ private static float  computeConfidence(Data data, AssociationRule AR)
 		}
 		if(isSupporting)
 			assCount++;
+		totAntCount += antCount;
+		totAssCount += assCount;
 	}
-	return ((float)assCount)/(antCount);	
+	return ((float)totAssCount)/(totAntCount);	
 }
 
 }

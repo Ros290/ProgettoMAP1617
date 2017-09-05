@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 
-public class FrequentPattern 
+public class FrequentPattern implements Comparable
 {
 
 	//private Item fp[];
@@ -88,5 +88,22 @@ public class FrequentPattern
 		
 		return value;
 	}
+
+	public int compareTo(Object fp) 
+	{
+		Iterator it = this.fp.iterator();
+		Iterator itfp = ((FrequentPattern)fp).iterator();
+		int flag = -1;
+		while ((it.hasNext())&&(itfp.hasNext()))
+		{
+			if (!it.next().equals(itfp.next()))
+			{
+				flag=1;
+				break;
+			}
+		}
+		return flag;
+	}
+
 
 }
