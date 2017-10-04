@@ -1,6 +1,5 @@
 package mining;
 
-import data.Attribute;
 import data.ContinuousAttribute;
 
 public class ContinuousItem extends Item

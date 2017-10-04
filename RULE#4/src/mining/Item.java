@@ -1,8 +1,10 @@
 package mining;
+import java.io.Serializable;
+
 import data.Attribute;
 
 
-public abstract class Item 
+public abstract class Item implements Serializable
 {
 	private Attribute attribute;
 	private Object value;
