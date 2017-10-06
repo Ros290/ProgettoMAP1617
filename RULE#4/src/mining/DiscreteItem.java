@@ -20,7 +20,11 @@ public class DiscreteItem extends Item
 	 */
 	boolean checkItemCondition (Object value)
 	{
-		return this.getValue().equals(value);
+		String value1 = ((String)this.getValue()).toLowerCase();
+		String value2 = ((String)value).toLowerCase();
+		if (value1.compareTo(value2) == 0 )
+			return true;
+		else return false;
 	}
 	
 }

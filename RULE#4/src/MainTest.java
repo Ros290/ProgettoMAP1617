@@ -25,7 +25,7 @@ public class MainTest
 	 */
 	public static void main(String[] args) 
 	{
-		Data data= new Data();
+		Data data= new Data("playtennis");
 		AssociationRuleArchieve archive=new AssociationRuleArchieve();
 		float minSup=(float)0.0,minConf=(float)0.0;
 		String nomeFile = "";
