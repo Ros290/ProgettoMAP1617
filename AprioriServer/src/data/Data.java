@@ -20,23 +20,14 @@ public class Data
 	private List<Attribute> attributeSet = new LinkedList <Attribute>();
 	
 	
-	public Data(String table)
+	public Data(String table) throws SQLException, DatabaseConnectionException
 	{
         this.data = new ArrayList<TupleData>();
         DbAccess db = new DbAccess();
         TableData td = new TableData(db);
         //db.closeConnection();
-
-        try {
-            db.initConnection();
-            this.data = td.getTransazioni(table);
-        } catch (DatabaseConnectionException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
+        db.initConnection();
+        this.data = td.getTransazioni(table);
 
         this.numberOfExamples = this.data.size();
         attributeSet = new LinkedList<>();	 
