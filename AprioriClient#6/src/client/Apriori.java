@@ -1,8 +1,10 @@
 package client;
 
 
+
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,7 +13,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
@@ -26,13 +31,22 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import keyboardinput.Keyboard;
 
 
 
-public class MainTest extends JApplet
+
+
+
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.pdf.PdfWriter;
+
+
+
+public class Apriori extends JApplet
 {
 	
 	
@@ -40,6 +54,7 @@ public class MainTest extends JApplet
 	private static int DEFAULT_PORT = 8080;
 	private static Socket socket = null;
 	Frame window;
+	String rules;
 	
 	private class Frame extends JPanel
 	{
@@ -51,7 +66,7 @@ public class MainTest extends JApplet
 		/**
 		 * Create the application.
 		 */
-		public Frame(java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aChange) 
+		public Frame(java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aSaveOnPDF, java.awt.event.ActionListener aChange) 
 		{
 			frame = new JFrame();
 			frame.setBounds(100, 100, 621, 440);
@@ -148,10 +163,15 @@ public class MainTest extends JApplet
 			frame.getContentPane().add(cpMiningCommand);
 			cpMiningCommand.setLayout(null);
 			
-			JButton aprioriConstructionBt = new JButton("Apriori");
-			aprioriConstructionBt.setBounds(248, 0, 89, 23);
+			JButton aprioriConstructionBt = new JButton("MINE");
+			aprioriConstructionBt.setBounds(132, 0, 140, 23);
 			aprioriConstructionBt.addActionListener(aLearn);
 			cpMiningCommand.add(aprioriConstructionBt);
+			
+			JButton aprioriPDFBt = new JButton("MINE & SAVE on PDF");
+			aprioriPDFBt.setBounds(282, 0, 140, 23);
+			aprioriPDFBt.addActionListener(aSaveOnPDF);
+			cpMiningCommand.add(aprioriPDFBt);
 		}
 
 	}
@@ -203,7 +223,8 @@ public class MainTest extends JApplet
 				writeObject (socket, window.nameFileTxt.getText());
 			if (((String)readObject(socket)).equals("OK"))
 			{
-				window.rulesAreaTxt.setText((String)readObject(socket));
+				rules = (String)readObject(socket);
+				window.rulesAreaTxt.setText(rules);
 				window.msgAreaTxt.setText((String)readObject(socket));
 			}
 			else if (((String)readObject(socket)).equals("ERR"))
@@ -230,6 +251,36 @@ public class MainTest extends JApplet
 
 	}
 	
+	public void PDFCreator () 
+	{
+		JFileChooser request = new JFileChooser();
+		request.setFileFilter(new FileNameExtensionFilter("PDF Documents", "pdf"));
+		if (request.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+		{
+			String dest = request.getSelectedFile().getAbsolutePath();
+			if (!request.getSelectedFile().getAbsolutePath().endsWith(".pdf"))
+				dest += ".pdf";
+		    File file = new File(dest);
+			file.getParentFile().mkdirs();
+			com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+			try 
+			{
+				PdfWriter.getInstance(document, new FileOutputStream(dest)); 
+				com.itextpdf.text.Rectangle two = new com.itextpdf.text.Rectangle(700,400);
+				document.open();
+				com.itextpdf.text.Paragraph p = new com.itextpdf.text.Paragraph(window.rulesAreaTxt.getText());
+				document.add(p);
+				document.setPageSize(two);
+				document.close();
+				window.msgAreaTxt.setText(window.msgAreaTxt.getText() + "\nFile PDF salvato con successo!");
+			}
+			catch (FileNotFoundException | DocumentException e) 
+			{
+				window.msgAreaTxt.setText(window.msgAreaTxt.getText() + "\nSi è verificato un errore durante la creazione del file PDF");
+			}
+		}
+	}
+	
 	//public static void main(String[] args)  
 	public void init()
 	{
@@ -246,6 +297,14 @@ public class MainTest extends JApplet
 						public void actionPerformed(ActionEvent e) 
 						{
 							Learning();
+						}
+					},
+					new java.awt.event.ActionListener() 
+					{
+						public void actionPerformed(ActionEvent e) 
+						{
+							Learning();
+							PDFCreator();
 						}
 					},
 					new java.awt.event.ActionListener() 

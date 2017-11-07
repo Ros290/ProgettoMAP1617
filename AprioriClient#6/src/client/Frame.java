@@ -178,9 +178,13 @@ public class Frame {
 		frame.getContentPane().add(cpMiningCommand);
 		cpMiningCommand.setLayout(null);
 		
-		JButton aprioriConstructionBt = new JButton("Apriori");
-		aprioriConstructionBt.setBounds(248, 0, 89, 23);
+		JButton aprioriConstructionBt = new JButton("MINE");
+		aprioriConstructionBt.setBounds(132, 0, 140, 23);
 		cpMiningCommand.add(aprioriConstructionBt);
+		
+		JButton aprioriPDFBt = new JButton("MINE & SAVE on PDF");
+		aprioriPDFBt.setBounds(282, 0, 140, 23);
+		cpMiningCommand.add(aprioriPDFBt);
 
 		
 	}

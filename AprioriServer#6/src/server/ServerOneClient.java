@@ -178,7 +178,7 @@ class ServerOneClient extends Thread {
 					archive.salva(fileName);
 					writeObject(socket,"OK");
 					writeObject(socket, result);
-					writeObject(socket, "Operazione Completata");
+					writeObject(socket, "Ottenute le regole richieste!");
 				} 		
 				catch(Exception e)
 				{
