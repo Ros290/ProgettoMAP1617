@@ -24,6 +24,8 @@ import java.io.*;
  */
 class ServerOneClient extends Thread {
     private Socket socket;
+    private Data data;
+    private AssociationRuleArchieve archive;
 
 
     /**
@@ -104,7 +106,7 @@ class ServerOneClient extends Thread {
 		try
         {
 	        String fileName = (String)readObject(socket);
-	        AssociationRuleArchieve archive=new AssociationRuleArchieve();
+	        archive=new AssociationRuleArchieve();
 	        try
 	        {
 	        	//Qualora, durante il caricamento del file, venga sollevata un'eccezione, molto probabilmente esso sarà provocata dal fatto che
@@ -132,8 +134,9 @@ class ServerOneClient extends Thread {
     /**
      * Si occupa di leggere il set dal database e di inviarlo al client
      * @param socket del client
+     * @throws IOException 
      */
-    private void learningFromDb(Socket socket)
+    private void learningFromDb(Socket socket) throws IOException
     {
     	float minSup,minConf;
     	try 
@@ -142,11 +145,11 @@ class ServerOneClient extends Thread {
 			minSup = (float)readObject(socket);
 			minConf = (float)readObject(socket);
 			String fileName = (String)readObject(socket);
-			Data data = new Data(tableName);
+			data = new Data(tableName);
 			if ((minSup>0 && minSup<1) && (minConf>0 && minConf<1))
 			{
 				LinkedList<FrequentPattern> outputFP = FrequentPatternMiner.frequentPatternDiscovery(data,minSup);
-				AssociationRuleArchieve archive=new AssociationRuleArchieve();
+				archive=new AssociationRuleArchieve();
 				try 
 				{
 					Iterator<FrequentPattern> it=outputFP.iterator();
@@ -186,12 +189,37 @@ class ServerOneClient extends Thread {
 					writeObject(socket, e.getMessage());
 				}
 			}
+			else
+			{
+				writeObject(socket,"ERR");
+				writeObject(socket, "Valore di Supporto e di Confidenza devono essere > 0 e < 1");
+			}
 		}
-    	catch (Exception e) 
+    	
+    	catch (IOException | ClassNotFoundException e) 
     	{
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-    	} 
+			writeObject(socket,"ERR");
+			writeObject(socket, "Rilevato errore durante l'esecuzione : " + e.getMessage());
+    	}
+    	
+    	catch (SQLException e) 
+    	{
+			writeObject(socket,"ERR");
+			writeObject(socket, "Errore, non vi è alcuna tabella nel database associato a quello ricercato");
+    	}
+    	
+    	catch (DatabaseConnectionException e) 
+    	{
+			writeObject(socket,"ERR");
+			writeObject(socket, "Problemi con la comunicazione con il database");
+    	}
+    	
+    	catch (EmptySetException e) 
+    	{
+			writeObject(socket,"ERR");
+			writeObject(socket, "Tale tabella non contiene elementi");
+    	}
+    	
     }
 
 }

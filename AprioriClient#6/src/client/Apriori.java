@@ -24,15 +24,19 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+
 
 
 
@@ -59,7 +63,7 @@ public class Apriori extends JApplet
 	private class Frame extends JPanel
 	{
 		private JFrame frame;
-		private JTextField nameDataTxt, minSupTxt, minConfTxt, nameFileTxt;
+		private JTextField nameDataTxt, nameMinSupTxt, nameMinConfTxt, nameFileTxt;
 		private TextArea msgAreaTxt, rulesAreaTxt;
 		private JRadioButton db, file;
 		
@@ -69,109 +73,114 @@ public class Apriori extends JApplet
 		public Frame(java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aSaveOnPDF, java.awt.event.ActionListener aChange) 
 		{
 			frame = new JFrame();
-			frame.setBounds(100, 100, 621, 440);
+			frame.setBounds(100, 100, 668, 440);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.getContentPane().setLayout(null);
 			
-			JPanel cpParameterSetting = new JPanel();
-			cpParameterSetting.setBounds(10, 11, 585, 132);
-			cpParameterSetting.setBorder(BorderFactory.createTitledBorder("Apriori"));
-			frame.getContentPane().add(cpParameterSetting);
-			cpParameterSetting.setLayout(null);
+			JTabbedPane aprioriTab = new JTabbedPane(JTabbedPane.TOP);
+			aprioriTab.setBounds(0, 0, 642, 402);
+			frame.getContentPane().add(aprioriTab);
+			
+			JPanel miningPanel = new JPanel();
+			aprioriTab.addTab("Mining", null, miningPanel, null);
+			miningPanel.setLayout(null);
 			
 			JPanel cpAprioriMining = new JPanel();
-			cpAprioriMining.setBounds(10, 23, 160, 81);
+			cpAprioriMining.setBounds(10, 11, 136, 95);
+			miningPanel.add(cpAprioriMining);
 			cpAprioriMining.setBorder(BorderFactory.createTitledBorder("Selecting Data Source"));
-			cpParameterSetting.add(cpAprioriMining);
 			cpAprioriMining.setLayout(null);
 			
-			db = new JRadioButton("Learning rules from db");
-			db.setBounds(6, 25, 148, 23);
+			db = new JRadioButton("Learning from db");
+			db.setBounds(6, 24, 109, 23);
+			cpAprioriMining.add(db);
 			db.addActionListener(aChange);
 			db.setSelected(true);
-			cpAprioriMining.add(db);
 			
-			file = new JRadioButton("Reading rules from file");
-			file.setBounds(6, 51, 148, 23);
-			file.addActionListener(aChange);
+			file = new JRadioButton("Reading from File");
+			file.setBounds(6, 50, 109, 23);
 			cpAprioriMining.add(file);
+			file.addActionListener(aChange);
 			
 			ButtonGroup group = new ButtonGroup();
 			group.add(db);
 			group.add(file);
 			
 			JPanel cpAprioriInput = new JPanel();
-			cpAprioriInput.setBounds(251, 23, 283, 81);
+			cpAprioriInput.setBounds(156, 11, 471, 95);
 			cpAprioriInput.setBorder(BorderFactory.createTitledBorder("Input Parameters"));
-			cpParameterSetting.add(cpAprioriInput);
+			miningPanel.add(cpAprioriInput);
 			cpAprioriInput.setLayout(null);
 			
 			JLabel data = new JLabel("Data");
-			data.setBounds(10, 27, 46, 14);
+			data.setBounds(10, 24, 46, 14);
 			cpAprioriInput.add(data);
 			
 			nameDataTxt = new JTextField();
-			nameDataTxt.setBounds(39, 24, 86, 20);
+			nameDataTxt.setBounds(52, 21, 86, 20);
 			cpAprioriInput.add(nameDataTxt);
 			nameDataTxt.setColumns(10);
 			
-			JLabel minSup = new JLabel("MinSup");
-			minSup.setBounds(150, 27, 46, 14);
+			JLabel minSup = new JLabel("Min Sup");
+			minSup.setBounds(148, 21, 56, 14);
 			cpAprioriInput.add(minSup);
 			
-			minSupTxt = new JTextField();
-			minSupTxt.setBounds(206, 24, 39, 20);
-			cpAprioriInput.add(minSupTxt);
-			minSupTxt.setColumns(3);
-			
-			JLabel minConf = new JLabel("MinConf");
-			minConf.setBounds(150, 56, 46, 14);
-			cpAprioriInput.add(minConf);
-			
-			minConfTxt = new JTextField();
-			minConfTxt.setColumns(3);
-			minConfTxt.setBounds(206, 53, 39, 20);
-			cpAprioriInput.add(minConfTxt);
+			nameMinSupTxt = new JTextField();
+			nameMinSupTxt.setColumns(10);
+			nameMinSupTxt.setBounds(214, 18, 76, 20);
+			cpAprioriInput.add(nameMinSupTxt);
 			
 			JLabel nameFile = new JLabel("Save");
 			nameFile.setBounds(10, 52, 46, 14);
 			cpAprioriInput.add(nameFile);
 			
 			nameFileTxt = new JTextField();
-			nameFileTxt.setBounds(39, 52, 86, 20);
-			cpAprioriInput.add(nameFileTxt);
 			nameFileTxt.setColumns(10);
+			nameFileTxt.setBounds(52, 49, 86, 20);
+			cpAprioriInput.add(nameFileTxt);
+			
+			JLabel minConf = new JLabel("Min Conf");
+			minConf.setBounds(148, 52, 56, 14);
+			cpAprioriInput.add(minConf);
+			
+			nameMinConfTxt = new JTextField();
+			nameMinConfTxt.setColumns(10);
+			nameMinConfTxt.setBounds(214, 49, 76, 20);
+			cpAprioriInput.add(nameMinConfTxt);
+			
+			JButton aprioriConstructionBt = new JButton("Mine");
+			aprioriConstructionBt.setBounds(300, 15, 161, 23);
+			cpAprioriInput.add(aprioriConstructionBt);
+			aprioriConstructionBt.addActionListener(aLearn);
+			
+			JButton aprioriPDFBt = new JButton("Mine & Save on PDF");
+			aprioriPDFBt.setBounds(300, 48, 161, 23);
+			cpAprioriInput.add(aprioriPDFBt);
+			aprioriPDFBt.addActionListener(aSaveOnPDF);
 			
 			JPanel cpRuleViewer = new JPanel();
-			cpRuleViewer.setBounds(10, 195, 585, 196);
+			cpRuleViewer.setBounds(10, 117, 617, 246);
 			cpRuleViewer.setBorder(BorderFactory.createTitledBorder("Pattern and Rules"));
-			frame.getContentPane().add(cpRuleViewer);
+			miningPanel.add(cpRuleViewer);
 			cpRuleViewer.setLayout(null);
 			
 			rulesAreaTxt = new TextArea();
-			rulesAreaTxt.setBounds(10, 25, 565, 96);
+			rulesAreaTxt.setBounds(10, 22, 597, 126);
 			rulesAreaTxt.setEditable(false);
 			cpRuleViewer.add(rulesAreaTxt);
 			
 			msgAreaTxt = new TextArea();
-			msgAreaTxt.setBounds(10, 127, 565, 59);
+			msgAreaTxt.setBounds(10, 154, 597, 82);
 			msgAreaTxt.setEditable(false);
 			cpRuleViewer.add(msgAreaTxt);
 			
-			JPanel cpMiningCommand = new JPanel();
-			cpMiningCommand.setBounds(10, 151, 585, 33);
-			frame.getContentPane().add(cpMiningCommand);
-			cpMiningCommand.setLayout(null);
+			JLayeredPane layeredPane = new JLayeredPane();
+			aprioriTab.addTab("New tab", null, layeredPane, null);
 			
-			JButton aprioriConstructionBt = new JButton("MINE");
-			aprioriConstructionBt.setBounds(132, 0, 140, 23);
-			aprioriConstructionBt.addActionListener(aLearn);
-			cpMiningCommand.add(aprioriConstructionBt);
+			JPanel selectionRulesApriori = new JPanel();
+			selectionRulesApriori.setBounds(0, 0, 637, 374);
+			layeredPane.add(selectionRulesApriori);
 			
-			JButton aprioriPDFBt = new JButton("MINE & SAVE on PDF");
-			aprioriPDFBt.setBounds(282, 0, 140, 23);
-			aprioriPDFBt.addActionListener(aSaveOnPDF);
-			cpMiningCommand.add(aprioriPDFBt);
 		}
 
 	}
@@ -212,8 +221,8 @@ public class Apriori extends JApplet
 			{	
 				writeObject (socket, 1);
 				writeObject (socket, window.nameDataTxt.getText());
-				writeObject(socket, Float.parseFloat(window.minSupTxt.getText()));
-				writeObject (socket, Float.parseFloat(window.minConfTxt.getText()));
+				writeObject(socket, Float.parseFloat(window.nameMinSupTxt.getText()));
+				writeObject (socket, Float.parseFloat(window.nameMinConfTxt.getText()));
 			}
 			else
 				writeObject (socket, 2);
@@ -221,13 +230,14 @@ public class Apriori extends JApplet
 				writeObject (socket, "map");
 			else
 				writeObject (socket, window.nameFileTxt.getText());
-			if (((String)readObject(socket)).equals("OK"))
+			String esito = (String)readObject(socket);
+			if (esito.equals("OK"))
 			{
 				rules = (String)readObject(socket);
 				window.rulesAreaTxt.setText(rules);
 				window.msgAreaTxt.setText((String)readObject(socket));
 			}
-			else if (((String)readObject(socket)).equals("ERR"))
+			else if (esito.equals("ERR"))
 			{
 				window.rulesAreaTxt.setText("");
 				window.msgAreaTxt.setText((String)readObject(socket));
@@ -242,9 +252,9 @@ public class Apriori extends JApplet
 		catch (IOException e) 
 		{
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) 
+		} 
+		catch (ClassNotFoundException e) 
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -312,8 +322,8 @@ public class Apriori extends JApplet
 						public void actionPerformed(ActionEvent e) 
 						{
 							boolean x = window.db.isSelected();
-							window.minSupTxt.setEditable(x);
-							window.minConfTxt.setEditable(x);
+							window.nameMinSupTxt.setEditable(x);
+							window.nameMinConfTxt.setEditable(x);
 							window.nameDataTxt.setEditable(x);
 						}
 					});
