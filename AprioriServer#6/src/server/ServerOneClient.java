@@ -1,13 +1,18 @@
 package server;
 
+import data.Attribute;
+import data.ContinuousAttribute;
 import data.Data;
+import data.DiscreteAttribute;
 import data.EmptySetException;
 import database.DatabaseConnectionException;
 import mining.AssociationRule;
 import mining.AssociationRuleArchieve;
 import mining.AssociationRuleMiner;
+import mining.ContinuousItem;
 import mining.FrequentPattern;
 import mining.FrequentPatternMiner;
+import mining.Interval;
 import mining.NoPatternException;
 import mining.OneLevelPatternException;
 
@@ -83,6 +88,9 @@ class ServerOneClient extends Thread {
                     case 2: // STORE CLUSTER IN FILE
                         learningFromFile(socket);
                         break;
+                    case 3 : //SEND ATTRIBUTES
+                    	sendAttributesList(socket);
+                    	break;
                     default:
                        	// Nel caso venga selezionata un'operazione non supportata, si esce
                         break;
@@ -93,6 +101,60 @@ class ServerOneClient extends Thread {
                 break;
             }
         }
+    }
+    
+    private void sendAttributesList(Socket socket)
+    {
+    	try 
+    	{
+    		for (int i = 0; i < data.getNumberOfAttributes() ; i++)
+    		{ 
+    			if (data.getAttribute(i) instanceof DiscreteAttribute)
+    			{
+    				DiscreteAttribute da =  (DiscreteAttribute) data.getAttribute(i);
+    				writeObject(socket, 'A');
+    				writeObject(socket, da.getName());
+    				for (int j = 0; j < da.getNumberOfDistinctValues(); j++)
+    				{
+    					writeObject(socket, 'V');
+    					writeObject(socket, da.getValue(j));
+    				}
+    			}
+    			else
+    			{
+    				ContinuousAttribute ca = (ContinuousAttribute) data.getAttribute(i);
+    				writeObject(socket, 'A');
+    				writeObject(socket, ca.getName());
+    				Iterator<Float> it =  ca.iterator();
+    				if (it.hasNext())
+    				{
+    					float inf = it.next();
+    					while (it.hasNext())
+    					{
+    						writeObject(socket, 'V');
+    						float sup = it.next();
+    						//ContinuousItem item;
+    						if (it.hasNext())
+    							//item = new ContinuousItem ((ContinuousAttribute)currentAttribute, new Interval (inf,sup));
+    							writeObject(socket, inf + "," + sup);
+    						else
+    							writeObject(socket, inf + "," + (sup+0.01f*(sup-inf)));
+    						inf = sup;
+
+    					}
+    				}
+    			}
+    		}
+    		writeObject(socket, 'K');
+		} 
+    	catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    	catch (EmptySetException e)
+    	{
+    		
+    	}
     }
 
     /**
