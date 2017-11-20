@@ -3,6 +3,10 @@ package client;
 import java.awt.Component;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,8 +41,16 @@ import javax.swing.JTextField;
 import javax.swing.MenuElement;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+
+
+
+
+
 
 
 
@@ -76,8 +88,8 @@ public class Apriori extends JApplet
 	private static String SUB_BUTTON_CRULE_RIGHT = "subConfR";
 	Frame window;
 	String rules;
-	JPopupMenu menuAssociation;
-	JPopupMenu menuConfident;
+	JPopupMenu menuAssociation, menuConfident;
+	JPopupMenu queryAssociation, queryLeftConfident, queryRightConfident;
 	
 	private class Frame extends JPanel
 	{
@@ -285,6 +297,14 @@ public class Apriori extends JApplet
 			JButton subLeftConfRule = new JButton("-");
 			subLeftConfRule.setBounds(72, 61, 41, 23);
 			subLeftConfRule.setName(SUB_BUTTON_CRULE_LEFT);
+			subLeftConfRule.addActionListener
+			(new java.awt.event.ActionListener() 
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+					queryLeftConfident.show(subLeftConfRule, 0, subLeftConfRule.getBounds().height);
+				}
+			});
 			findConfRulePanel.add(subLeftConfRule);
 			
 			JButton addRightConfRule = new JButton("+");
@@ -303,6 +323,14 @@ public class Apriori extends JApplet
 			JButton subRightConfRule = new JButton("-");
 			subRightConfRule.setBounds(222, 61, 41, 23);
 			subRightConfRule.setName(SUB_BUTTON_CRULE_RIGHT);
+			subRightConfRule.addActionListener
+			(new java.awt.event.ActionListener() 
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+					queryRightConfident.show(subRightConfRule, 0, subRightConfRule.getBounds().height);
+				}
+			});
 			findConfRulePanel.add(subRightConfRule);
 			
 			JPanel findAssRulePanel = new JPanel();
@@ -333,6 +361,14 @@ public class Apriori extends JApplet
 			JButton subAssociationRule = new JButton("-");
 			subAssociationRule.setBounds(169, 61, 41, 23);
 			subAssociationRule.setName(SUB_BUTTON_ARULE);
+			subAssociationRule.addActionListener
+			(new java.awt.event.ActionListener() 
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+					queryAssociation.show(subAssociationRule, 0, subAssociationRule.getBounds().height);
+				}
+			});
 			findAssRulePanel.add(subAssociationRule);
 
 			cpRuleFinder = new JPanelRulesArea (selectionRulesApriori);
@@ -376,37 +412,119 @@ public class Apriori extends JApplet
 		String string;
 		menuAssociation = new JPopupMenu();
 		menuConfident = new JPopupMenu();
+		queryAssociation = new JPopupMenu();
+		queryLeftConfident = new JPopupMenu();
+		queryRightConfident = new JPopupMenu();
 		char c = (char)readObject(socket);
 		while (c == 'A')
 		{
 			string = (String)readObject(socket);
 			JMenu menuAttributeAss = new JMenu (string);
+			menuAttributeAss.addMouseListener
+			(new MouseListener()
+			{
+
+				@Override
+				public void mouseClicked(MouseEvent arg0) 
+				{
+					JPopupMenu popupMenu = (JPopupMenu) ((JMenu)arg0.getSource()).getParent();
+					Component invokerMenu = popupMenu.getInvoker();
+					JButton button = (JButton)invokerMenu;
+					if (button.getName().startsWith("sub"))
+						removingItemFromQuery(arg0);
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
 			JMenu menuAttributeConf = new JMenu (string);
+			menuAttributeConf.addMouseListener
+			(new MouseListener()
+			{
+
+				@Override
+				public void mouseClicked(MouseEvent arg0) 
+				{
+					JPopupMenu popupMenu = (JPopupMenu) ((JMenu)arg0.getSource()).getParent();
+					Component invokerMenu = popupMenu.getInvoker();
+					JButton button = (JButton)invokerMenu;
+					if (button.getName().startsWith("sub"))
+						removingItemFromQuery(arg0);
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mousePressed(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+			
 			c = (char)readObject(socket);
 			while (c == 'V')
 			{
 				string = (String)readObject(socket);
 				JMenuItem menuItemAss = new JMenuItem(string);
-				JMenuItem menuItemConf = new JMenuItem(string);
-				//Inserire actionListener
-				menuItemAss.addActionListener
+				menuItemAss.addActionListener				
 				(new java.awt.event.ActionListener() 
 				{
 					public void actionPerformed(ActionEvent e) 
 					{
-
-						//removingItemFromMenu(menuAttribute, menuItem);
-					    removingItemFromMenu(e);
+						JButton button = (JButton)((Component)((JPopupMenu)((Component)((JPopupMenu)((JMenuItem) e.getSource()).getParent()).getInvoker()).getParent()).getInvoker());
+						if (button.getName().startsWith("add"))
+							addingItemToQuery(e);	
 					}
 				});
+				
+				JMenuItem menuItemConf = new JMenuItem(string);
 				menuItemConf.addActionListener
 				(new java.awt.event.ActionListener() 
 				{
 					public void actionPerformed(ActionEvent e) 
 					{
-
-						//removingItemFromMenu(menuAttribute, menuItem);
-					    removingItemFromMenu(e);
+						JButton button = (JButton)((Component)((JPopupMenu)((Component)((JPopupMenu)((JMenuItem) e.getSource()).getParent()).getInvoker()).getParent()).getInvoker());
+						if (button.getName().startsWith("add"))
+							addingItemToQuery(e);
 					}
 				});
 				
@@ -417,20 +535,12 @@ public class Apriori extends JApplet
 			menuAssociation.add(menuAttributeAss);
 			menuConfident.add(menuAttributeConf);
 		}
-		/*
-		for (MenuElement me :  menuAssociation.getSubElements())
-		{
-			if (me instanceof JMenu)
-				System.out.println(((JMenu)me).getText());
-			else if (me instanceof JMenuItem)
-				System.out.println(((JMenuItem)me).getText());
-		}
-		*/
 	}
-	
-	private void removingItemFromMenu (ActionEvent e)
+
+	private void addingItemToQuery (ActionEvent e)
 	{
 		JTextField textField;
+		JPopupMenu menu;
 	    JMenuItem selectedMenuItem = (JMenuItem) e.getSource(); 
 	    JPopupMenu selectedMenuAttribute = (JPopupMenu) selectedMenuItem.getParent(); 
 	    Component invoker = selectedMenuAttribute.getInvoker();
@@ -440,11 +550,20 @@ public class Apriori extends JApplet
 		JButton button = (JButton)invokerMenu; 
 	    //JButton button = (JButton)((Component)((JPopupMenu)((Component)((JPopupMenu)((JMenuItem) e.getSource()).getParent()).getInvoker()).getParent()).getInvoker()).getParent();
 	    if (button.getName().equals(ADD_BUTTON_ARULE))
+	    {
 	    	textField = window.associationRule;
+	    	menu = queryAssociation;
+	    }
 	        else if (button.getName().equals(ADD_BUTTON_CRULE_LEFT))
+	        {
 	        	textField = window.leftConfRule;
+	        	menu = queryLeftConfident;
+	        }
 	        	else if ((button.getName().equals(ADD_BUTTON_CRULE_RIGHT)))
+	        	{
 	        		textField = window.rightConfRule;
+	        		menu = queryRightConfident;
+	        	}
 	        		else	return;
 	    //MOSTRA TUTTE LE OPZIONI DISPONIBILI NEL MENU
 	    /*
@@ -468,7 +587,55 @@ public class Apriori extends JApplet
 		if (!textField.getText().isEmpty())
 			textField.setText(textField.getText() + " AND ");
 		textField.setText(textField.getText() + "<" + ((JMenu)invoker).getText() + ">=<" + selectedMenuItem.getText() + ">");
-		((JMenu)invoker).setEnabled(false);
+		for (MenuElement menuElement : ((JMenu)invoker).getSubElements())
+			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
+				((JMenuItem)menuItem).setVisible(false);
+		menu.add((JMenu)invoker);
+	}
+	
+	private void removingItemFromQuery (MouseEvent e)
+	{
+		JTextField textField;
+		JPopupMenu menu;
+		JPopupMenu popupMenu = (JPopupMenu) ((JMenu)e.getSource()).getParent();
+		Component invokerMenu = popupMenu.getInvoker();
+		JButton button = (JButton)invokerMenu;
+	    if (button.getName().equals(SUB_BUTTON_ARULE))
+	    {
+	    	textField = window.associationRule;
+	    	menu = menuAssociation;
+	    }
+	        else if (button.getName().equals(SUB_BUTTON_CRULE_LEFT))
+	        {
+	        	textField = window.leftConfRule;
+	        	menu = menuConfident;
+	        }
+	        	else if ((button.getName().equals(SUB_BUTTON_CRULE_RIGHT)))
+	        	{
+	        		textField = window.rightConfRule;
+	        		menu = menuConfident;
+	        	}
+	        		else	return;
+	    
+	    String string = textField.getText();
+	    String attribute = "<" + ((JMenu)e.getSource()).getText() + ">=<";
+	    int startStrAttribute = string.indexOf(attribute);
+	    int endStrAttribute = string.indexOf('>', startStrAttribute + attribute.length()) + 1;
+	    String regularExpression = string.substring(startStrAttribute, endStrAttribute);
+	    //textField.setText(string.replaceFirst(regularExpression, ""));
+	    if ((startStrAttribute != 0) || (endStrAttribute != string.length()))
+	    {
+	    	if (endStrAttribute == string.length())
+	    		regularExpression = " AND " + regularExpression;
+	    	else
+	    		regularExpression += " AND ";
+	    }
+	    textField.setText(string.replaceFirst(regularExpression, ""));
+	    
+		for (MenuElement menuElement : ((JMenu)e.getSource()).getSubElements())
+			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
+				((JMenuItem)menuItem).setVisible(true);
+		menu.add((JMenu)e.getSource());
 	}
 
 	private void Learning () 
