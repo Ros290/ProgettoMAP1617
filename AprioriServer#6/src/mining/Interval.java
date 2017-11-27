@@ -7,7 +7,7 @@ public class Interval implements Serializable
 	private float inf;
 	private float sup;
 	
-	Interval (float inf, float sup)
+	public Interval (float inf, float sup)
 	{
 		this.inf = inf;
 		this.sup = sup;

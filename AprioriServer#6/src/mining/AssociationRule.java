@@ -1,6 +1,7 @@
 package mining;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 
 public class AssociationRule implements Comparable<AssociationRule>, Serializable
@@ -14,6 +15,12 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 	 * Costruttore della classe 
 	 * @param support valore di supporto
 	 */
+	
+	public AssociationRule ()
+	{
+		
+	}
+	
 	public AssociationRule (float support)
 	{
 		this.support = support;
@@ -123,6 +130,45 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 	public int compareTo(AssociationRule AR)
 	{
 		return (this.confidence != AR.getConfidence()) == true ? 1 : -1;
+	}
+	
+	boolean isContained (AssociationRule AR,char side)
+	{
+		if ((this.antecedent.length < AR.antecedent.length)||(this.consequent.length < AR.consequent.length))
+			return false;
+		Item [] arPattern;
+		Item [] arThis;
+		switch (side)
+		{
+			case 'L':
+				arPattern = AR.antecedent;
+				arThis = this.antecedent;
+				break;
+			
+			case 'R':
+				arPattern = AR.consequent;
+				arThis = this.consequent;
+				break;
+			
+			default:
+				return false;
+		}
+		boolean flag = true;
+		for (Item arPatternItem : arPattern)
+		{
+			flag = false;
+			for (Item arThisItem : arThis)
+			{
+				if (arThisItem.compareTo(arPatternItem))
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (flag == false)
+				break;
+		}
+		return flag;
 	}
 	
 	public String toString()

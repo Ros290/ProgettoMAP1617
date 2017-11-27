@@ -35,4 +35,9 @@ public class DiscreteAttribute extends Attribute
 	{
 		return this.values[index];
 	}
+	
+	public String[] getValues ()
+	{
+		return this.values;
+	}
 }

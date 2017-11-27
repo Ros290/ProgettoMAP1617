@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -45,6 +46,9 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+
+
 
 
 
@@ -98,6 +102,9 @@ public class Apriori extends JApplet
 		private JPanelRulesArea cpRuleViewer, cpRuleFinder;
 		private JRadioButton db, file;
 		
+		/*
+		 * Rapressenta i due JText presenti su ciascun panel
+		 */
 		private class JPanelRulesArea extends JPanel
 		{
 			private TextArea rulesAreaTxt, msgAreaTxt;
@@ -150,6 +157,11 @@ public class Apriori extends JApplet
 			db = new JRadioButton("Learning from db");
 			db.setBounds(6, 24, 109, 23);
 			cpAprioriMining.add(db);
+			/*
+			 * Ogni volta che viene selezionato il pallino, viene modificata la visibilità
+			 * dei campi qui sotto riportati
+			 * 
+			 */
 			db.addActionListener
 			(new java.awt.event.ActionListener() 
 			{
@@ -370,6 +382,22 @@ public class Apriori extends JApplet
 				}
 			});
 			findAssRulePanel.add(subAssociationRule);
+			
+			JButton findPdf = new JButton("FIND & PDF");
+			findPdf.setBounds(525, 65, 102, 30);
+			selectionRulesApriori.add(findPdf);
+			
+			JButton find = new JButton("FIND");
+			find.setBounds(525, 24, 102, 30);
+			find.addActionListener
+			(new java.awt.event.ActionListener() 
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+					getRulesFromQuery();
+				}
+			});
+			selectionRulesApriori.add(find);
 
 			cpRuleFinder = new JPanelRulesArea (selectionRulesApriori);
 			
@@ -406,10 +434,24 @@ public class Apriori extends JApplet
 		out.writeObject(o);
 		out.flush();
 	}
-	
+
+	/**
+	 *Ricava gli attributi e gli item associati ad essi dal server nel seguente formato:
+	 * 		
+	 * 		- 'A', carattere che indica che la prossima stringa indica il nome di un attributo -> 'nome Attributo'
+	 * 		- 'V', carattere che indica che la prossima stringa indica un valore riferito all'attributo
+	 * 			passato precendemente -> 'nome Valore'
+	 * 
+	 *Oltre questo, istanzia i menù e inserisce i valori ricavati dal server su 'menuAssociation' e 'menuConfident'
+	 * 
+	 *ATTENZIONE: finchè il client non effettua alcuna ricerca di mining al server, non potrà ottenere gli attributi-valori
+	 *da ricercare. Inoltre, ad ogni nuova ricerca di mining effettuata, viene invocata questa funzione, riportando
+	 *i nuovi attributi-valori ottenuti dalla nuova ricerca
+	 */
 	private void getAttributesList (Socket socket) throws ClassNotFoundException, IOException
 	{
 		String string;
+		int index;
 		menuAssociation = new JPopupMenu();
 		menuConfident = new JPopupMenu();
 		queryAssociation = new JPopupMenu();
@@ -419,7 +461,14 @@ public class Apriori extends JApplet
 		while (c == 'A')
 		{
 			string = (String)readObject(socket);
+			index = (int)readObject(socket);
+			/*
+			 * definisco il campo quale sarà associato al nome dell'attributo.
+			 * tale campo, conterrà al suo interno i campi relativi ai valori assumibili da tale attributo.
+			 * Potrà essere selezionato in caso si debba modificare la query, rimuovendo un determinato attributo (pulsante -)
+			 */
 			JMenu menuAttributeAss = new JMenu (string);
+			menuAttributeAss.setName(String.valueOf(index));
 			menuAttributeAss.addMouseListener
 			(new MouseListener()
 			{
@@ -427,11 +476,14 @@ public class Apriori extends JApplet
 				@Override
 				public void mouseClicked(MouseEvent arg0) 
 				{
+					// ricavo il popupMenu che contiene l'elemento del menu selezionato
 					JPopupMenu popupMenu = (JPopupMenu) ((JMenu)arg0.getSource()).getParent();
 					Component invokerMenu = popupMenu.getInvoker();
+					// dal popupMenu, ricavo il bottone da cui è stato invocato
 					JButton button = (JButton)invokerMenu;
 					if (button.getName().startsWith("sub"))
 						removingItemFromQuery(arg0);
+					javax.swing.MenuSelectionManager.defaultManager().clearSelectedPath();
 				}
 
 				@Override
@@ -460,6 +512,7 @@ public class Apriori extends JApplet
 				
 			});
 			JMenu menuAttributeConf = new JMenu (string);
+			menuAttributeConf.setName(String.valueOf(index));
 			menuAttributeConf.addMouseListener
 			(new MouseListener()
 			{
@@ -467,11 +520,14 @@ public class Apriori extends JApplet
 				@Override
 				public void mouseClicked(MouseEvent arg0) 
 				{
+					// ricavo il popupMenu che contiene l'elemento del menu selezionato
 					JPopupMenu popupMenu = (JPopupMenu) ((JMenu)arg0.getSource()).getParent();
 					Component invokerMenu = popupMenu.getInvoker();
+					// dal popupMenu, ricavo il bottone da cui è stato invocato
 					JButton button = (JButton)invokerMenu;
 					if (button.getName().startsWith("sub"))
 						removingItemFromQuery(arg0);
+					javax.swing.MenuSelectionManager.defaultManager().clearSelectedPath();
 				}
 
 				@Override
@@ -504,7 +560,12 @@ public class Apriori extends JApplet
 			while (c == 'V')
 			{
 				string = (String)readObject(socket);
+				/*
+				 * definisco il campo quale sarà associato il valore.
+				 * tale valore potrà essere aggiunto alla query tramite il pulsante +
+				 */
 				JMenuItem menuItemAss = new JMenuItem(string);
+				menuItemAss.setName("N");
 				menuItemAss.addActionListener				
 				(new java.awt.event.ActionListener() 
 				{
@@ -517,6 +578,7 @@ public class Apriori extends JApplet
 				});
 				
 				JMenuItem menuItemConf = new JMenuItem(string);
+				menuItemConf.setName("N");
 				menuItemConf.addActionListener
 				(new java.awt.event.ActionListener() 
 				{
@@ -527,16 +589,21 @@ public class Apriori extends JApplet
 							addingItemToQuery(e);
 					}
 				});
-				
+				//aggiunge il valore al campo attributo
 				menuAttributeAss.add(menuItemAss);
 				menuAttributeConf.add(menuItemConf);
 				c = (char)readObject(socket);
 			}
+			//infine, aggiunge il campo attributo ad entrambi i menu
 			menuAssociation.add(menuAttributeAss);
 			menuConfident.add(menuAttributeConf);
 		}
 	}
 
+	/**
+	 * In base al valore selezionato, lo aggiunge alla query e modifica i menù riferiti alla barra di ricerca su cui si opera
+	 * @param e
+	 */
 	private void addingItemToQuery (ActionEvent e)
 	{
 		JTextField textField;
@@ -546,10 +613,18 @@ public class Apriori extends JApplet
 	    Component invoker = selectedMenuAttribute.getInvoker();
 	    JPopupMenu popupMenu = (JPopupMenu) invoker.getParent();
 		Component invokerMenu = popupMenu.getInvoker();
-		//JButton button = (JButton) invokerMenu.getParent();
+		//ricavo il bottone da cui è stato aperto il menu
 		JButton button = (JButton)invokerMenu; 
-	    //JButton button = (JButton)((Component)((JPopupMenu)((Component)((JPopupMenu)((JMenuItem) e.getSource()).getParent()).getInvoker()).getParent()).getInvoker()).getParent();
-	    if (button.getName().equals(ADD_BUTTON_ARULE))
+	    /*
+	     * Definisco la barra associata al bottone, e il menu su cui sarà spostato il campo selezionato.
+	     * 
+	     * Difatti, lo stesso campo JMenu non può risiedere su differenti menù, perciò se viene aggiunto
+	     * nel menu Y, il menu X che lo conteneva adesso non vi avrà più accesso
+	     * 
+	     * Quindi il nuovo menù su cui andrò ad aggiungere tale campo, sarà quello riferito al bottone -
+	     * mostrando il menu che indica gli attributi presenti nella query 
+	     */
+		if (button.getName().equals(ADD_BUTTON_ARULE))
 	    {
 	    	textField = window.associationRule;
 	    	menu = queryAssociation;
@@ -583,16 +658,33 @@ public class Apriori extends JApplet
 			}
 		}
 		*/
-	    
+		/*
+		 * Inserisco l'attributo e il valore dell'attributo selezionato nella query
+		 */
 		if (!textField.getText().isEmpty())
 			textField.setText(textField.getText() + " AND ");
 		textField.setText(textField.getText() + "<" + ((JMenu)invoker).getText() + ">=<" + selectedMenuItem.getText() + ">");
-		for (MenuElement menuElement : ((JMenu)invoker).getSubElements())
+		selectedMenuItem.setName("Y");
+		
+		/*
+		 * dal campo dell'attributo, tolgo la visibilità a tutti i valori ad esso associati, ed infine lo aggiungo al
+		 * menu associato al bottone - della barra. 
+		 * 
+		 * Questo perchè, appena si aprirà il menu nel bottone -, si vedranno solamente i nomi degli attributi presenti
+		 * nella query, ma non i valori da essi assunti.
+		 */
+		JMenu menuAttribute = (JMenu)invoker;
+		for (MenuElement menuElement : (menuAttribute).getSubElements())
 			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
 				((JMenuItem)menuItem).setVisible(false);
-		menu.add((JMenu)invoker);
+		menu.add(menuAttribute);
 	}
 	
+	/**
+	 * Contrariamente alla funzione addingItemToQuery, rimuove un determinato campo dalla query e modifica
+	 * i menù associati alla barra di ricerca su cui si opera
+	 * @param e
+	 */
 	private void removingItemFromQuery (MouseEvent e)
 	{
 		JTextField textField;
@@ -600,6 +692,14 @@ public class Apriori extends JApplet
 		JPopupMenu popupMenu = (JPopupMenu) ((JMenu)e.getSource()).getParent();
 		Component invokerMenu = popupMenu.getInvoker();
 		JButton button = (JButton)invokerMenu;
+	    /*
+	     * Definisco la barra associata al bottone, e il menu su cui sarà spostato il campo selezionato.
+	     * 
+	     * (vedi commento presente all'interno della funzione 'addingItemToQuery'
+	     * 
+	     * Quindi il nuovo menù su cui andrò ad aggiungere tale campo, sarà quello riferito al bottone +
+	     * mostrando il menu che indica i valori degli attributi da poter aggiungere nella query
+	     */
 	    if (button.getName().equals(SUB_BUTTON_ARULE))
 	    {
 	    	textField = window.associationRule;
@@ -617,12 +717,14 @@ public class Apriori extends JApplet
 	        	}
 	        		else	return;
 	    
+	    /*
+	     * ricavo la stringa nella query che è associata all'attributo selezionato nel menu, e lo rimuovo
+	     */
 	    String string = textField.getText();
 	    String attribute = "<" + ((JMenu)e.getSource()).getText() + ">=<";
 	    int startStrAttribute = string.indexOf(attribute);
 	    int endStrAttribute = string.indexOf('>', startStrAttribute + attribute.length()) + 1;
 	    String regularExpression = string.substring(startStrAttribute, endStrAttribute);
-	    //textField.setText(string.replaceFirst(regularExpression, ""));
 	    if ((startStrAttribute != 0) || (endStrAttribute != string.length()))
 	    {
 	    	if (endStrAttribute == string.length())
@@ -632,10 +734,74 @@ public class Apriori extends JApplet
 	    }
 	    textField.setText(string.replaceFirst(regularExpression, ""));
 	    
+		/*
+		 * dal campo dell'attributo, rimetto la visibilità a tutti i valori ad esso associati, ed infine lo aggiungo al
+		 * menu associato al bottone + della barra. 
+		 */
 		for (MenuElement menuElement : ((JMenu)e.getSource()).getSubElements())
+		{
 			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
+			{
 				((JMenuItem)menuItem).setVisible(true);
+				((JMenuItem)menuItem).setName("N");
+			}
+		}
 		menu.add((JMenu)e.getSource());
+	}
+	
+	private void getRulesFromQuery ()
+	{
+		/*
+		MenuElement attributeMenuAss [] = queryAssociation.getSubElements();
+		MenuElement attributeMenuConfL [] = queryLeftConfident.getSubElements();
+		MenuElement attributeMenuConfR [] = queryRightConfident.getSubElements();
+		*/
+		try
+		{
+			writeObject(socket,4);
+			sendQuery(queryAssociation, 'A');
+			sendQuery(queryLeftConfident, 'L');
+			sendQuery(queryRightConfident, 'R');
+			writeObject(socket,'E');
+			if (((String)readObject(socket)).equals("OK"))
+				window.cpRuleFinder.rulesAreaTxt.setText((String)readObject(socket));
+		}
+		catch (IOException | ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private void sendQuery (JPopupMenu menu, char type) throws IOException, ClassNotFoundException
+	{
+		
+		MenuElement attributeMenu [] = menu.getSubElements();
+		if (attributeMenu.length != 0)
+		{
+			for (MenuElement elementMenu : attributeMenu)
+			{
+				JMenu attribute = (JMenu)elementMenu;
+				MenuElement subPopupMenu [] = attribute.getSubElements();
+				MenuElement elementAttributeMenu[] = subPopupMenu[0].getSubElements();
+				for (MenuElement itemMenu : elementAttributeMenu)
+				{
+					JMenuItem item = (JMenuItem)itemMenu;
+					if (item.getName().equals("Y"))
+					{
+						writeObject(socket, type);
+						writeObject(socket,Integer.parseInt(attribute.getName()));
+						writeObject(socket,item.getText());
+					} 
+				}
+			}
+		}
+		/*
+		else
+		{
+			writeObject(socket, type);
+			writeObject(socket, "NULL");
+		}
+		*/
 	}
 
 	private void Learning () 

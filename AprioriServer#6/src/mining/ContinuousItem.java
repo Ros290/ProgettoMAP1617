@@ -5,11 +5,24 @@ import data.ContinuousAttribute;
 public class ContinuousItem extends Item
 {
 
-	ContinuousItem(ContinuousAttribute attribute, Interval value) 
+	public ContinuousItem(ContinuousAttribute attribute, Interval value) 
 	{
 		super(attribute, value);
 	}
 
+	boolean compareTo (Item item)
+	{
+		if (item instanceof ContinuousItem)
+		{
+			ContinuousItem ci = (ContinuousItem) item;
+			Interval ciInterval =(Interval) ci.getValue();
+			Interval thisInterval = (Interval) this.getValue();
+			if ((ciInterval.getInf() == thisInterval.getInf())&&(ciInterval.getSup() == thisInterval.getSup()))
+				return true;
+		}
+		return false;
+	}
+	
 	boolean checkItemCondition(Object value) 
 	{
 		return ((Interval)this.getValue()).checkValueInclusion((float)value);

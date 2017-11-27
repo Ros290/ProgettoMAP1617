@@ -10,7 +10,7 @@ public class DiscreteItem extends Item
 	 * @param attribute attributo relativo all'item
 	 * @param value valore assunto dall'item
 	 */
-	DiscreteItem (DiscreteAttribute attribute, String value)
+	public DiscreteItem (DiscreteAttribute attribute, String value)
 	{
 		super (attribute,value);
 	}
@@ -25,6 +25,16 @@ public class DiscreteItem extends Item
 		if (value1.compareTo(value2) == 0 )
 			return true;
 		else return false;
+	}
+	
+	boolean compareTo (Item item)
+	{
+		if (item instanceof DiscreteItem)
+		{
+			if (this.getValue().equals(item.getValue()))
+				return true;
+		}
+		return false;
 	}
 	
 }

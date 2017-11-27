@@ -10,6 +10,7 @@ import mining.AssociationRule;
 import mining.AssociationRuleArchieve;
 import mining.AssociationRuleMiner;
 import mining.ContinuousItem;
+import mining.DiscreteItem;
 import mining.FrequentPattern;
 import mining.FrequentPatternMiner;
 import mining.Interval;
@@ -27,7 +28,8 @@ import java.io.*;
 /**
  * Classe che gestisce una singola connessione da parte di un client
  */
-class ServerOneClient extends Thread {
+class ServerOneClient extends Thread 
+{
     private Socket socket;
     private Data data;
     private AssociationRuleArchieve archive;
@@ -91,6 +93,9 @@ class ServerOneClient extends Thread {
                     case 3 : //SEND ATTRIBUTES
                     	sendAttributesList(socket);
                     	break;
+                    case 4 :
+                    	sendRulesFromQuery(socket);
+                    	break;
                     default:
                        	// Nel caso venga selezionata un'operazione non supportata, si esce
                         break;
@@ -114,6 +119,7 @@ class ServerOneClient extends Thread {
     				DiscreteAttribute da =  (DiscreteAttribute) data.getAttribute(i);
     				writeObject(socket, 'A');
     				writeObject(socket, da.getName());
+    				writeObject(socket, da.getIndex());
     				for (int j = 0; j < da.getNumberOfDistinctValues(); j++)
     				{
     					writeObject(socket, 'V');
@@ -125,6 +131,7 @@ class ServerOneClient extends Thread {
     				ContinuousAttribute ca = (ContinuousAttribute) data.getAttribute(i);
     				writeObject(socket, 'A');
     				writeObject(socket, ca.getName());
+    				writeObject(socket, ca.getIndex());
     				Iterator<Float> it =  ca.iterator();
     				if (it.hasNext())
     				{
@@ -154,6 +161,92 @@ class ServerOneClient extends Thread {
     	catch (EmptySetException e)
     	{
     		
+    	}
+    }
+    
+    /**
+     * @throws IOException 
+     * @throws ClassNotFoundException 
+     * @throws EmptySetException 
+     * @throws NoPatternException 
+     * 
+     */
+    private void sendRulesFromQuery (Socket socket)
+    {
+    	try
+    	{
+    		FrequentPattern fpQuery = new FrequentPattern();
+    		AssociationRule arQuery = new AssociationRule();
+    		int index;
+    		char type = (char)readObject(socket); 
+    		while(type != 'E')
+    		{
+    			switch (type)
+    			{
+    				case 'A':
+    					index = (int)readObject(socket);
+    					if (data.getAttribute(index) instanceof DiscreteAttribute)
+    					{
+    						DiscreteAttribute da = (DiscreteAttribute)data.getAttribute(index);
+    						fpQuery.addItem(new DiscreteItem (da, (String)readObject(socket)));
+    					}
+    					else
+    					{
+    						ContinuousAttribute ca = (ContinuousAttribute)data.getAttribute(index);
+    						String item = (String)readObject(socket);
+    						float inf = Float.parseFloat(item.substring(0, item.indexOf(',')));
+    						float sup = Float.parseFloat(item.substring(item.indexOf(',') + 1, item.length()));
+    						fpQuery.addItem(new ContinuousItem (ca, new Interval(inf,sup) ));
+    					}
+    					break;
+    					
+    				case 'L':
+    					index = (int)readObject(socket);
+    					if (data.getAttribute(index) instanceof DiscreteAttribute)
+    					{
+    						DiscreteAttribute da = (DiscreteAttribute)data.getAttribute(index);
+    						arQuery.addAntecedentItem(new DiscreteItem (da, (String)readObject(socket)));
+    						//fpQuery.addItem(new DiscreteItem (da, (String)readObject(socket)));
+    					}
+    					else
+    					{
+    						ContinuousAttribute ca = (ContinuousAttribute)data.getAttribute(index);
+    						String item = (String)readObject(socket);
+    						float inf = Float.parseFloat(item.substring(0, item.indexOf(',')));
+    						float sup = Float.parseFloat(item.substring(item.indexOf(',') + 1, item.length()));
+    						arQuery.addAntecedentItem(new ContinuousItem (ca, new Interval(inf,sup)));
+    						//fpQuery.addItem(new ContinuousItem (ca, new Interval(inf,sup) ));
+    					}
+    					break;
+    					
+    				case 'R':
+    					index = (int)readObject(socket);
+    					if (data.getAttribute(index) instanceof DiscreteAttribute)
+    					{
+    						DiscreteAttribute da = (DiscreteAttribute)data.getAttribute(index);
+    						arQuery.addConsequentItem(new DiscreteItem (da, (String)readObject(socket)));
+    						//fpQuery.addItem(new DiscreteItem (da, (String)readObject(socket)));
+    					}
+    					else
+    					{
+    						ContinuousAttribute ca = (ContinuousAttribute)data.getAttribute(index);
+    						String item = (String)readObject(socket);
+    						float inf = Float.parseFloat(item.substring(0, item.indexOf(',')));
+    						float sup = Float.parseFloat(item.substring(item.indexOf(',') + 1, item.length()));
+    						arQuery.addConsequentItem(new ContinuousItem (ca, new Interval(inf,sup)));
+    						//fpQuery.addItem(new ContinuousItem (ca, new Interval(inf,sup) ));
+    					}
+    					break;
+    			}
+    			type = (char)readObject(socket); 
+    		}
+    		AssociationRuleArchieve subArchieve = archive.getSubArchieve(fpQuery,arQuery);
+    		writeObject(socket,"OK");
+    		writeObject(socket,subArchieve.toString());
+    	}
+    	catch (ClassNotFoundException | IOException | EmptySetException e)
+    	{
+    		e.printStackTrace();
     	}
     }
 
@@ -231,7 +324,8 @@ class ServerOneClient extends Thread {
 								tree.add(itRule.next());
 							}
 							//inserisco il frequent Pattern e le sue regole di confidenza nell'archivio
-							archive.put(FP,tree);			
+							if (!tree.isEmpty())
+								archive.put(FP,tree);	
 						} 
 						catch (OneLevelPatternException | NoPatternException e) 
 						{

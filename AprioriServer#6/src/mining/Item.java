@@ -40,6 +40,8 @@ public abstract class Item implements Serializable
 	
 	abstract boolean checkItemCondition(Object value);
 	
+	abstract boolean compareTo (Item item);
+	
 	public String toString()
 	{
 		return "<" + this.attribute.toString() + ">=<" + this.value.toString() + ">"; 

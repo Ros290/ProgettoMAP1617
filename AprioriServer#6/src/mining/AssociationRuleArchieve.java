@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -37,9 +38,11 @@ public class AssociationRuleArchieve implements Serializable
 	
 	public TreeSet<AssociationRule> getRules (FrequentPattern fp) throws NoPatternException
 	{
-		if (archive.containsKey(fp))
-			return archive.get(fp);
-		else
+		//if ((archive.containsKey(fp))&&(!(archive.get(fp)).isEmpty()))
+		if(archive.containsKey(fp))
+			if(archive.get(fp) != null)
+				return archive.get(fp);
+		//else
 			throw new NoPatternException("Il pattern '"+fp.toString()+"' non ha generato regole confidenti");
 	}
 	
@@ -96,5 +99,45 @@ public class AssociationRuleArchieve implements Serializable
     public boolean isEmpty ()
     {
     	return archive.isEmpty();
+    }
+    
+    public AssociationRuleArchieve getSubArchieve (FrequentPattern fp, AssociationRule ar) 
+    {
+    	AssociationRuleArchieve newArchieve = new AssociationRuleArchieve();
+    	boolean changed;
+    	Set<FrequentPattern> fpSet = this.archive.keySet();
+    	Iterator it = fpSet.iterator();
+    	FrequentPattern fpArchieve = new FrequentPattern();
+    	while (it.hasNext())
+    	{
+    		fpArchieve = (FrequentPattern)it.next(); 
+    		if ((fpArchieve).isContained(fp))
+    		{
+    			TreeSet<AssociationRule> rulesContained = new TreeSet<AssociationRule>();
+    			try
+    			{
+    				TreeSet<AssociationRule> rulesPattern = this.getRules(fpArchieve);
+    				//rulesContained = rulesPattern;
+    			
+    				Iterator itPattern = rulesPattern.iterator();
+    				while (itPattern.hasNext())
+    				{
+    					AssociationRule arPattern = (AssociationRule)itPattern.next();
+    						if ((arPattern.isContained(ar, 'L'))&&(arPattern.isContained(ar, 'R')))
+    							rulesContained.add(arPattern);
+    				}
+    			}
+    			catch (NoPatternException e)
+    			{
+    			}
+    			finally
+    			{
+    				if (rulesContained.isEmpty())
+    					rulesContained = null;
+    				newArchieve.put(fpArchieve, rulesContained);
+    			}
+    		}
+    	}
+    	return newArchieve;
     }
 }

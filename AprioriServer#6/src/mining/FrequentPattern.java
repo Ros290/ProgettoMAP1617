@@ -17,7 +17,7 @@ public class FrequentPattern implements Comparable, Serializable
 	/**
 	 * Costruttore
 	 */
-	FrequentPattern()
+	public FrequentPattern()
 	{
 		fp = new LinkedList<Item>();
 	}
@@ -26,7 +26,7 @@ public class FrequentPattern implements Comparable, Serializable
 	 * Aggiunge un nuovo item al pattern
 	 * @param item item da aggiungere
 	 */
-	void addItem(Item item)
+	public void addItem(Item item)
 	{
 		fp.add(item);
 	}
@@ -35,7 +35,7 @@ public class FrequentPattern implements Comparable, Serializable
 	 * 
 	 * @return ritorna il numero di item compresi nel pattern
 	 */
-	int getPatternLength ()
+	public int getPatternLength ()
 	{
 		return fp.size();
 	}
@@ -94,7 +94,7 @@ public class FrequentPattern implements Comparable, Serializable
 	{
 		Iterator it = this.fp.iterator();
 		Iterator itfp = ((FrequentPattern)fp).iterator();
-		int flag = -1;
+		int flag = 0;
 		while ((it.hasNext())&&(itfp.hasNext()))
 		{
 			if (!it.next().equals(itfp.next()))
@@ -106,5 +106,34 @@ public class FrequentPattern implements Comparable, Serializable
 		return flag;
 	}
 
-
+	/**
+	 * Verifica se il FrequentPattern in analisi contiene le regole presenti nel frequent Pattern passato come argomento della funzione
+	 * @param fp Frequent Pattern da confrontare rispetto a quello in analisi
+	 * @return boolean, ritorna true se gli elementi di fp sono presenti nel FrequentPattern in analisi, false altrimenti
+	 */
+	public boolean isContained(FrequentPattern fp)
+	{
+		if (this.getPatternLength() < fp.getPatternLength())
+			return false;
+		Iterator it = this.fp.iterator();
+		Iterator itfp = fp.iterator();
+		boolean flag = true;
+		while (itfp.hasNext())
+		{
+			flag = false;
+			Item itemFp = (Item) itfp.next();
+			while (it.hasNext())
+			{
+				Item itemThisFp = (Item)it.next();
+				if ((itemThisFp.compareTo(itemFp)))
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (flag == false)
+				break;
+		}
+		return flag;
+	}
 }
