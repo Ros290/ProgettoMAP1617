@@ -126,15 +126,12 @@ public class AssociationRuleArchieve implements Serializable
     						if ((arPattern.isContained(ar, 'L'))&&(arPattern.isContained(ar, 'R')))
     							rulesContained.add(arPattern);
     				}
+    				if (!rulesContained.isEmpty())
+    					newArchieve.put(fpArchieve, rulesContained);
     			}
     			catch (NoPatternException e)
     			{
-    			}
-    			finally
-    			{
-    				if (rulesContained.isEmpty())
-    					rulesContained = null;
-    				newArchieve.put(fpArchieve, rulesContained);
+    				newArchieve.put(fpArchieve, null);
     			}
     		}
     	}

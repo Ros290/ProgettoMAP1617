@@ -18,7 +18,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
+//import java.util.List;
+import java.awt.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -29,6 +30,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -46,6 +48,9 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+
+
 
 
 
@@ -98,7 +103,8 @@ public class Apriori extends JApplet
 	private class Frame extends JPanel
 	{
 		private JFrame frame;
-		private JTextField nameDataTxt, nameMinSupTxt, nameMinConfTxt, nameFileTxt, leftConfRule, rightConfRule, associationRule;
+		private JTextField nameDataTxt, nameMinSupTxt, nameMinConfTxt, nameFileTxt;
+		private List associationRule, leftConfRule, rightConfRule;
 		private JPanelRulesArea cpRuleViewer, cpRuleFinder;
 		private JRadioButton db, file;
 		
@@ -271,30 +277,28 @@ public class Apriori extends JApplet
 			findRulePanel.add(selectionRulesApriori);
 			selectionRulesApriori.setLayout(null);
 			
+			//CONFIDENT RULE QUERY PANEL
+			
 			JPanel findConfRulePanel = new JPanel();
 			findConfRulePanel.setLayout(null);
 			findConfRulePanel.setBorder(BorderFactory.createTitledBorder("Confident Rule"));
-			findConfRulePanel.setBounds(239, 11, 276, 95);
+			findConfRulePanel.setBounds(212, 11, 315, 95);
 			selectionRulesApriori.add(findConfRulePanel);
 			
-			leftConfRule = new JTextField();
-			leftConfRule.setColumns(10);
-			leftConfRule.setBounds(10, 24, 103, 20);
-			leftConfRule.setEditable(false);
+			leftConfRule = new List();
+			leftConfRule.setBounds(10, 22, 135, 42);
 			findConfRulePanel.add(leftConfRule);
 			
 			JLabel label = new JLabel("=>");
-			label.setBounds(123, 27, 27, 14);
+			label.setBounds(142, 40, 16, 14);
 			findConfRulePanel.add(label);
 			
-			rightConfRule = new JTextField();
-			rightConfRule.setColumns(10);
-			rightConfRule.setBounds(160, 24, 103, 20);
-			rightConfRule.setEditable(false);
+			rightConfRule = new List();
+			rightConfRule.setBounds(159, 22, 146, 42);
 			findConfRulePanel.add(rightConfRule);
 			
 			JButton addLeftConfRule = new JButton("+");
-			addLeftConfRule.setBounds(10, 61, 41, 23);
+			addLeftConfRule.setBounds(10, 70, 41, 16);
 			addLeftConfRule.setName(ADD_BUTTON_CRULE_LEFT);
 			addLeftConfRule.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -307,7 +311,7 @@ public class Apriori extends JApplet
 			findConfRulePanel.add(addLeftConfRule);
 			
 			JButton subLeftConfRule = new JButton("-");
-			subLeftConfRule.setBounds(72, 61, 41, 23);
+			subLeftConfRule.setBounds(101, 70, 41, 16);
 			subLeftConfRule.setName(SUB_BUTTON_CRULE_LEFT);
 			subLeftConfRule.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -320,7 +324,7 @@ public class Apriori extends JApplet
 			findConfRulePanel.add(subLeftConfRule);
 			
 			JButton addRightConfRule = new JButton("+");
-			addRightConfRule.setBounds(159, 61, 41, 23);
+			addRightConfRule.setBounds(158, 70, 41, 16);
 			addRightConfRule.setName(ADD_BUTTON_CRULE_RIGHT);
 			addRightConfRule.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -333,7 +337,7 @@ public class Apriori extends JApplet
 			findConfRulePanel.add(addRightConfRule);
 			
 			JButton subRightConfRule = new JButton("-");
-			subRightConfRule.setBounds(222, 61, 41, 23);
+			subRightConfRule.setBounds(264, 70, 41, 16);
 			subRightConfRule.setName(SUB_BUTTON_CRULE_RIGHT);
 			subRightConfRule.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -345,20 +349,21 @@ public class Apriori extends JApplet
 			});
 			findConfRulePanel.add(subRightConfRule);
 			
+			
+			//ASSOCIATION RULE QUERY PANEL
+			
 			JPanel findAssRulePanel = new JPanel();
 			findAssRulePanel.setLayout(null);
 			findAssRulePanel.setBorder(BorderFactory.createTitledBorder("Association Rule"));
-			findAssRulePanel.setBounds(10, 11, 219, 95);
+			findAssRulePanel.setBounds(10, 11, 192, 95);
 			selectionRulesApriori.add(findAssRulePanel);
-			
-			associationRule = new JTextField();
-			associationRule.setColumns(10);
-			associationRule.setBounds(10, 24, 200, 20);
-			associationRule.setEditable(false);
+
+			associationRule = new List();
+			associationRule.setBounds(10, 22, 172, 40);
 			findAssRulePanel.add(associationRule);
 			
 			JButton addAssociationRule = new JButton("+");
-			addAssociationRule.setBounds(10, 61, 41, 23);
+			addAssociationRule.setBounds(10, 68, 41, 16);
 			addAssociationRule.setName(ADD_BUTTON_ARULE);
 			addAssociationRule.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -371,7 +376,7 @@ public class Apriori extends JApplet
 			findAssRulePanel.add(addAssociationRule);
 			
 			JButton subAssociationRule = new JButton("-");
-			subAssociationRule.setBounds(169, 61, 41, 23);
+			subAssociationRule.setBounds(141, 68, 41, 16);
 			subAssociationRule.setName(SUB_BUTTON_ARULE);
 			subAssociationRule.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -384,11 +389,11 @@ public class Apriori extends JApplet
 			findAssRulePanel.add(subAssociationRule);
 			
 			JButton findPdf = new JButton("FIND & PDF");
-			findPdf.setBounds(525, 65, 102, 30);
+			findPdf.setBounds(537, 65, 90, 30);
 			selectionRulesApriori.add(findPdf);
 			
 			JButton find = new JButton("FIND");
-			find.setBounds(525, 24, 102, 30);
+			find.setBounds(537, 24, 90, 30);
 			find.addActionListener
 			(new java.awt.event.ActionListener() 
 			{
@@ -401,10 +406,7 @@ public class Apriori extends JApplet
 
 			cpRuleFinder = new JPanelRulesArea (selectionRulesApriori);
 			
-			//addMenuOnButton(addAssociationRule);
-			//addMenuOnButton(subAssociationRule);
 		}
-
 	}
 
     /**
@@ -606,7 +608,7 @@ public class Apriori extends JApplet
 	 */
 	private void addingItemToQuery (ActionEvent e)
 	{
-		JTextField textField;
+		List textField;
 		JPopupMenu menu;
 	    JMenuItem selectedMenuItem = (JMenuItem) e.getSource(); 
 	    JPopupMenu selectedMenuAttribute = (JPopupMenu) selectedMenuItem.getParent(); 
@@ -661,10 +663,18 @@ public class Apriori extends JApplet
 		/*
 		 * Inserisco l'attributo e il valore dell'attributo selezionato nella query
 		 */
+		
+		/* [JTextField textField]
 		if (!textField.getText().isEmpty())
 			textField.setText(textField.getText() + " AND ");
 		textField.setText(textField.getText() + "<" + ((JMenu)invoker).getText() + ">=<" + selectedMenuItem.getText() + ">");
 		selectedMenuItem.setName("Y");
+		*/
+		JMenu menuAttribute = (JMenu)invoker;
+		
+		//textField.add("<" + menuAttribute.getText() + ">=<" + selectedMenuItem.getText() + ">", Integer.parseInt(menuAttribute.getName()));
+		textField.add("<" + menuAttribute.getText() + ">=<" + selectedMenuItem.getText() + ">");
+		selectedMenuItem.setName("Y");		
 		
 		/*
 		 * dal campo dell'attributo, tolgo la visibilità a tutti i valori ad esso associati, ed infine lo aggiungo al
@@ -673,7 +683,6 @@ public class Apriori extends JApplet
 		 * Questo perchè, appena si aprirà il menu nel bottone -, si vedranno solamente i nomi degli attributi presenti
 		 * nella query, ma non i valori da essi assunti.
 		 */
-		JMenu menuAttribute = (JMenu)invoker;
 		for (MenuElement menuElement : (menuAttribute).getSubElements())
 			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
 				((JMenuItem)menuItem).setVisible(false);
@@ -687,7 +696,8 @@ public class Apriori extends JApplet
 	 */
 	private void removingItemFromQuery (MouseEvent e)
 	{
-		JTextField textField;
+		//JTextField textField;
+		List textField;
 		JPopupMenu menu;
 		JPopupMenu popupMenu = (JPopupMenu) ((JMenu)e.getSource()).getParent();
 		Component invokerMenu = popupMenu.getInvoker();
@@ -720,6 +730,11 @@ public class Apriori extends JApplet
 	    /*
 	     * ricavo la stringa nella query che è associata all'attributo selezionato nel menu, e lo rimuovo
 	     */
+	    
+	    //int index = Integer.parseInt(((JMenu)e.getSource()).getName());
+	    //textField.remove(index);
+
+	    /*[JTextField textField]
 	    String string = textField.getText();
 	    String attribute = "<" + ((JMenu)e.getSource()).getText() + ">=<";
 	    int startStrAttribute = string.indexOf(attribute);
@@ -733,11 +748,16 @@ public class Apriori extends JApplet
 	    		regularExpression += " AND ";
 	    }
 	    textField.setText(string.replaceFirst(regularExpression, ""));
+	    */
+	    
+	    
 	    
 		/*
 		 * dal campo dell'attributo, rimetto la visibilità a tutti i valori ad esso associati, ed infine lo aggiungo al
 		 * menu associato al bottone + della barra. 
 		 */
+	    textField.removeAll();
+	    
 		for (MenuElement menuElement : ((JMenu)e.getSource()).getSubElements())
 		{
 			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
@@ -747,6 +767,45 @@ public class Apriori extends JApplet
 			}
 		}
 		menu.add((JMenu)e.getSource());
+		
+		for (MenuElement menuElement : popupMenu.getSubElements())
+		{
+			JMenu attribute = (JMenu)menuElement;
+			MenuElement subPopupMenu [] = attribute.getSubElements();
+			MenuElement elementAttributeMenu[] = subPopupMenu[0].getSubElements();
+			for (MenuElement itemMenu : elementAttributeMenu)
+			{
+				JMenuItem item = (JMenuItem) itemMenu;
+				if (item.getName().equals("Y"))
+				{
+					textField.add("<" + attribute.getText() + ">=<" + item.getText() + ">");
+					break;
+				}
+			}
+		}
+		/*
+	    for (MenuElement menuElement : menu.getSubElements())
+	    {
+	    	JMenu menuAttribute = (JMenu) menuElement;
+	    	int i = Integer.parseInt(menuAttribute.getName());
+	    	if (index < i)
+	    	{
+	    		textField.add(textField.getItem(i), i-1);
+	    		textField.remove(i);
+	    	}
+	    }
+	    */
+		/*
+		for (MenuElement menuElement : popupMenu.getSubElements())
+		{
+	    	JMenu menuAttribute = (JMenu) menuElement;
+	    	int i = Integer.parseInt(menuAttribute.getName());
+	    	if (index < i)
+	    	{
+	    		menuAttribute.setName(String.valueOf(i-1));
+	    	}
+		}
+		*/
 	}
 	
 	private void getRulesFromQuery ()
