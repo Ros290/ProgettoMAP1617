@@ -1,12 +1,14 @@
 package client;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +20,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 //import java.util.List;
 import java.awt.List;
 
@@ -76,6 +79,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 
+
+import client.Apriori.Frame.JPanelRulesArea;
+
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -98,9 +104,11 @@ public class Apriori extends JApplet
 	Frame window;
 	String rules;
 	JPopupMenu menuAssociation, menuConfident;
-	JPopupMenu queryAssociation, queryLeftConfident, queryRightConfident;
+	JPopupMenu queryAssociation = new JPopupMenu();
+	JPopupMenu queryLeftConfident = new JPopupMenu(); 
+	JPopupMenu queryRightConfident = new JPopupMenu();
 	
-	private class Frame extends JPanel
+	class Frame extends JPanel
 	{
 		private JFrame frame;
 		private JTextField nameDataTxt, nameMinSupTxt, nameMinConfTxt, nameFileTxt;
@@ -111,7 +119,7 @@ public class Apriori extends JApplet
 		/*
 		 * Rapressenta i due JText presenti su ciascun panel
 		 */
-		private class JPanelRulesArea extends JPanel
+		class JPanelRulesArea extends JPanel
 		{
 			private TextArea rulesAreaTxt, msgAreaTxt;
 			
@@ -136,6 +144,46 @@ public class Apriori extends JApplet
 			}
 		}
 		
+		public void setLabelDescription (JLabel label, String text, String descriptionText)
+		{
+			label.setText("<html><u>"+text+"</u></html>");
+			label.addMouseListener(
+					new MouseListener(){
+						
+						@Override
+						public void mouseClicked(MouseEvent arg0) {
+							// TODO Auto-generated method stub
+							JOptionPane.showMessageDialog(null, descriptionText,"Description "+ text, JOptionPane.INFORMATION_MESSAGE);
+							
+						}
+
+						@Override
+						public void mouseEntered(MouseEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void mouseExited(MouseEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void mousePressed(MouseEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void mouseReleased(MouseEvent arg0) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+					});
+		}
+		
 		/**
 		 * Create the application.
 		 */
@@ -155,13 +203,13 @@ public class Apriori extends JApplet
 			miningPanel.setLayout(null);
 			
 			JPanel cpAprioriMining = new JPanel();
-			cpAprioriMining.setBounds(10, 11, 136, 95);
+			cpAprioriMining.setBounds(10, 11, 179, 95);
 			miningPanel.add(cpAprioriMining);
 			cpAprioriMining.setBorder(BorderFactory.createTitledBorder("Selecting Data Source"));
 			cpAprioriMining.setLayout(null);
 			
 			db = new JRadioButton("Learning from db");
-			db.setBounds(6, 24, 109, 23);
+			db.setBounds(6, 24, 150, 23);
 			cpAprioriMining.add(db);
 			/*
 			 * Ogni volta che viene selezionato il pallino, viene modificata la visibilità
@@ -182,7 +230,7 @@ public class Apriori extends JApplet
 			db.setSelected(true);
 			
 			file = new JRadioButton("Reading from File");
-			file.setBounds(6, 50, 109, 23);
+			file.setBounds(6, 50, 150, 23);
 			cpAprioriMining.add(file);
 			file.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -201,49 +249,53 @@ public class Apriori extends JApplet
 			group.add(file);
 			
 			JPanel cpAprioriInput = new JPanel();
-			cpAprioriInput.setBounds(156, 11, 471, 95);
+			cpAprioriInput.setBounds(199, 11, 428, 95);
 			cpAprioriInput.setBorder(BorderFactory.createTitledBorder("Input Parameters"));
 			miningPanel.add(cpAprioriInput);
 			cpAprioriInput.setLayout(null);
 			
-			JLabel data = new JLabel("Data");
+			JLabel data = new JLabel();
+			setLabelDescription(data, "Data", "Riportare il nome della tabella quale contiene i valori su cui si desidera effettuare l'operazione di Mining");
 			data.setBounds(10, 24, 46, 14);
 			cpAprioriInput.add(data);
 			
 			nameDataTxt = new JTextField();
-			nameDataTxt.setBounds(52, 21, 86, 20);
+			nameDataTxt.setBounds(58, 21, 62, 20);
 			cpAprioriInput.add(nameDataTxt);
 			nameDataTxt.setColumns(10);
 			
-			JLabel minSup = new JLabel("Min Sup");
-			minSup.setBounds(148, 21, 56, 14);
+			JLabel minSup = new JLabel();
+			minSup.setBounds(130, 24, 56, 14);
+			setLabelDescription (minSup, "Min Sup", "Riportare il valore minimo di supporto per ricercare le regole d'associazione");
 			cpAprioriInput.add(minSup);
 			
 			nameMinSupTxt = new JTextField();
 			nameMinSupTxt.setColumns(10);
-			nameMinSupTxt.setBounds(214, 18, 76, 20);
+			nameMinSupTxt.setBounds(187, 21, 62, 20);
 			cpAprioriInput.add(nameMinSupTxt);
 			
-			JLabel nameFile = new JLabel("Save");
+			JLabel nameFile = new JLabel("");
 			nameFile.setBounds(10, 52, 46, 14);
+			setLabelDescription (nameFile, "Save", "Riportare il nome del file su cui si desidera salvare / caricare le regole ricavate (facoltativo)");
 			cpAprioriInput.add(nameFile);
 			
 			nameFileTxt = new JTextField();
 			nameFileTxt.setColumns(10);
-			nameFileTxt.setBounds(52, 49, 86, 20);
+			nameFileTxt.setBounds(58, 49, 62, 20);
 			cpAprioriInput.add(nameFileTxt);
 			
-			JLabel minConf = new JLabel("Min Conf");
-			minConf.setBounds(148, 52, 56, 14);
+			JLabel minConf = new JLabel();
+			minConf.setBounds(130, 52, 56, 14);
+			setLabelDescription (minConf, "Min Conf", "Riportare il valore minimo di confidenza per ricercare le regole di confidenza associate alle regole di associazione");
 			cpAprioriInput.add(minConf);
 			
 			nameMinConfTxt = new JTextField();
 			nameMinConfTxt.setColumns(10);
-			nameMinConfTxt.setBounds(214, 49, 76, 20);
+			nameMinConfTxt.setBounds(187, 49, 62, 20);
 			cpAprioriInput.add(nameMinConfTxt);
 			
 			JButton aprioriConstructionBt = new JButton("Mine");
-			aprioriConstructionBt.setBounds(300, 15, 161, 23);
+			aprioriConstructionBt.setBounds(259, 20, 161, 23);
 			cpAprioriInput.add(aprioriConstructionBt);
 			aprioriConstructionBt.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -255,7 +307,7 @@ public class Apriori extends JApplet
 			});
 			
 			JButton aprioriPDFBt = new JButton("Mine & Save on PDF");
-			aprioriPDFBt.setBounds(300, 48, 161, 23);
+			aprioriPDFBt.setBounds(259, 48, 161, 23);
 			cpAprioriInput.add(aprioriPDFBt);
 			aprioriPDFBt.addActionListener
 			(new java.awt.event.ActionListener() 
@@ -263,7 +315,10 @@ public class Apriori extends JApplet
 				public void actionPerformed(ActionEvent e) 
 				{
 					Learning();
-					PDFCreator();
+					if (!cpRuleViewer.rulesAreaTxt.getText().isEmpty())
+						PDFCreator(cpRuleViewer);
+					else
+						cpRuleViewer.msgAreaTxt.setText(cpRuleViewer.msgAreaTxt.getText() + "\nImpossibile creare il file PDF");
 				}
 			});
 			
@@ -390,6 +445,18 @@ public class Apriori extends JApplet
 			
 			JButton findPdf = new JButton("FIND & PDF");
 			findPdf.setBounds(537, 65, 90, 30);
+			findPdf.addActionListener
+			(new java.awt.event.ActionListener() 
+			{
+				public void actionPerformed(ActionEvent e) 
+				{
+					getRulesFromQuery();
+					if (!cpRuleFinder.rulesAreaTxt.getText().isEmpty())
+						PDFCreator(cpRuleFinder);
+					else
+						cpRuleFinder.msgAreaTxt.setText(cpRuleFinder.msgAreaTxt.getText() + "\nImpossibile creare il file PDF");
+				}
+			});
 			selectionRulesApriori.add(findPdf);
 			
 			JButton find = new JButton("FIND");
@@ -403,7 +470,7 @@ public class Apriori extends JApplet
 				}
 			});
 			selectionRulesApriori.add(find);
-
+			
 			cpRuleFinder = new JPanelRulesArea (selectionRulesApriori);
 			
 		}
@@ -437,14 +504,9 @@ public class Apriori extends JApplet
 		out.flush();
 	}
 
+
 	/**
-	 *Ricava gli attributi e gli item associati ad essi dal server nel seguente formato:
-	 * 		
-	 * 		- 'A', carattere che indica che la prossima stringa indica il nome di un attributo -> 'nome Attributo'
-	 * 		- 'V', carattere che indica che la prossima stringa indica un valore riferito all'attributo
-	 * 			passato precendemente -> 'nome Valore'
-	 * 
-	 *Oltre questo, istanzia i menù e inserisce i valori ricavati dal server su 'menuAssociation' e 'menuConfident'
+	 *Istanzia i menù e inserisce i valori ricavati dal server su 'menuAssociation' e 'menuConfident'
 	 * 
 	 *ATTENZIONE: finchè il client non effettua alcuna ricerca di mining al server, non potrà ottenere gli attributi-valori
 	 *da ricercare. Inoltre, ad ogni nuova ricerca di mining effettuata, viene invocata questa funzione, riportando
@@ -460,6 +522,13 @@ public class Apriori extends JApplet
 		queryLeftConfident = new JPopupMenu();
 		queryRightConfident = new JPopupMenu();
 		char c = (char)readObject(socket);
+		/*
+		 *Ricava gli attributi e gli item associati ad essi dal server nel seguente formato:
+		 * 		
+		 * 		- 'A', carattere che indica che la prossima stringa indica il nome di un attributo -> 'nome Attributo'
+		 * 		- 'V', carattere che indica che la prossima stringa indica un valore riferito all'attributo
+		 * 			passato precendemente -> 'nome Valore'
+		 */
 		while (c == 'A')
 		{
 			string = (String)readObject(socket);
@@ -467,10 +536,24 @@ public class Apriori extends JApplet
 			/*
 			 * definisco il campo quale sarà associato al nome dell'attributo.
 			 * tale campo, conterrà al suo interno i campi relativi ai valori assumibili da tale attributo.
-			 * Potrà essere selezionato in caso si debba modificare la query, rimuovendo un determinato attributo (pulsante -)
+			 * 
+			 * ES: attributo Marca Macchina , i valori assumibili possono essere "Peugot", "Fiat", ecc 
+			 * 
+			 * Serve affinchè l'utente possa, in seguito, effettuare delle ricerce dettagliate in merito alle regole ricavate (vedi pannello Query)
+			 * 
+			 * Ci sono due menu quali, almeno inizialmente, conterranno gli stessi elementi, ovvero il menù relativo alle regole d'associazione, e quello
+			 * relativo alle regole di confidenza
 			 */
+			
+			//MENU REGOLE D'ASSOCIAZIONE
 			JMenu menuAttributeAss = new JMenu (string);
 			menuAttributeAss.setName(String.valueOf(index));
+			/*
+			 * il campo relativo al nome dell'attributo potrà essere selezionato quando si effettuerà
+			 * l'operazione di modifica della query di ricerca delle regole (vedi pannello Query).
+			 * Per la precisione, quando verrà cliccato nel menù che comparirà dopo che si è premuto il pulsante ' - '.
+			 * Così facendo, si rimuoverà l'attributo sia dalla query e sia dal relativo menu
+			 */
 			menuAttributeAss.addMouseListener
 			(new MouseListener()
 			{
@@ -483,6 +566,7 @@ public class Apriori extends JApplet
 					Component invokerMenu = popupMenu.getInvoker();
 					// dal popupMenu, ricavo il bottone da cui è stato invocato
 					JButton button = (JButton)invokerMenu;
+					//controllo che si operi sul bottone ' - ', in tal caso procedo a rimuovere l'elemento selezionato dal menu a tendina
 					if (button.getName().startsWith("sub"))
 						removingItemFromQuery(arg0);
 					javax.swing.MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -513,6 +597,12 @@ public class Apriori extends JApplet
 				}
 				
 			});
+			
+			//MENU REGOLE DI CONFIDENZA
+			
+			/*
+			 * Grosso modo, è identico a quello delle regole di Associazione
+			 */
 			JMenu menuAttributeConf = new JMenu (string);
 			menuAttributeConf.setName(String.valueOf(index));
 			menuAttributeConf.addMouseListener
@@ -567,18 +657,22 @@ public class Apriori extends JApplet
 				 * tale valore potrà essere aggiunto alla query tramite il pulsante +
 				 */
 				JMenuItem menuItemAss = new JMenuItem(string);
+				//Il motivo per cui si imposta tale nome sarà più chiaro nelle funzioni 'addingItemToQuery' e 'removingItemFromQuery'
 				menuItemAss.setName("N");
+				//il valore dell'attributo potrà essere selezionato per poterlo inserire nella Query
 				menuItemAss.addActionListener				
 				(new java.awt.event.ActionListener() 
 				{
 					public void actionPerformed(ActionEvent e) 
 					{
+						//ricavo il bottone quale ha generato l'evento, assicurandomi che si tratti del pulsante ' + ', dopo di che provvedo ad aggiungerlo alla query
 						JButton button = (JButton)((Component)((JPopupMenu)((Component)((JPopupMenu)((JMenuItem) e.getSource()).getParent()).getInvoker()).getParent()).getInvoker());
 						if (button.getName().startsWith("add"))
 							addingItemToQuery(e);	
 					}
 				});
 				
+				//come prima
 				JMenuItem menuItemConf = new JMenuItem(string);
 				menuItemConf.setName("N");
 				menuItemConf.addActionListener
@@ -591,12 +685,13 @@ public class Apriori extends JApplet
 							addingItemToQuery(e);
 					}
 				});
-				//aggiunge il valore al campo attributo
+				//aggiungo il valore al campo attributo
 				menuAttributeAss.add(menuItemAss);
 				menuAttributeConf.add(menuItemConf);
+				
 				c = (char)readObject(socket);
 			}
-			//infine, aggiunge il campo attributo ad entrambi i menu
+			//infine, aggiungo il campo attributo ad entrambi i menu
 			menuAssociation.add(menuAttributeAss);
 			menuConfident.add(menuAttributeConf);
 		}
@@ -642,37 +737,8 @@ public class Apriori extends JApplet
 	        		menu = queryRightConfident;
 	        	}
 	        		else	return;
-	    //MOSTRA TUTTE LE OPZIONI DISPONIBILI NEL MENU
-	    /*
-		for (MenuElement popupElement :  popupMenu.getSubElements())
-		{
-			if (popupElement instanceof JMenu)
-			{
-				JMenu menuAttribute = (JMenu)popupElement;
-				System.out.println((menuAttribute).getText());
-				for (MenuElement menuElement : menuAttribute.getSubElements())
-				{
-					JPopupMenu menuItem = (JPopupMenu)menuElement;
-					for (MenuElement item : menuItem.getSubElements())
-						System.out.print(((JMenuItem)item).getText());
-				}
-				System.out.println();
-			}
-		}
-		*/
-		/*
-		 * Inserisco l'attributo e il valore dell'attributo selezionato nella query
-		 */
 		
-		/* [JTextField textField]
-		if (!textField.getText().isEmpty())
-			textField.setText(textField.getText() + " AND ");
-		textField.setText(textField.getText() + "<" + ((JMenu)invoker).getText() + ">=<" + selectedMenuItem.getText() + ">");
-		selectedMenuItem.setName("Y");
-		*/
 		JMenu menuAttribute = (JMenu)invoker;
-		
-		//textField.add("<" + menuAttribute.getText() + ">=<" + selectedMenuItem.getText() + ">", Integer.parseInt(menuAttribute.getName()));
 		textField.add("<" + menuAttribute.getText() + ">=<" + selectedMenuItem.getText() + ">");
 		selectedMenuItem.setName("Y");		
 		
@@ -681,7 +747,7 @@ public class Apriori extends JApplet
 		 * menu associato al bottone - della barra. 
 		 * 
 		 * Questo perchè, appena si aprirà il menu nel bottone -, si vedranno solamente i nomi degli attributi presenti
-		 * nella query, ma non i valori da essi assunti.
+		 * nella query, ma non i valori da essi assumibili.
 		 */
 		for (MenuElement menuElement : (menuAttribute).getSubElements())
 			for (MenuElement menuItem : ((JPopupMenu)menuElement).getSubElements())
@@ -696,12 +762,12 @@ public class Apriori extends JApplet
 	 */
 	private void removingItemFromQuery (MouseEvent e)
 	{
-		//JTextField textField;
 		List textField;
 		JPopupMenu menu;
 		JPopupMenu popupMenu = (JPopupMenu) ((JMenu)e.getSource()).getParent();
 		Component invokerMenu = popupMenu.getInvoker();
 		JButton button = (JButton)invokerMenu;
+		
 	    /*
 	     * Definisco la barra associata al bottone, e il menu su cui sarà spostato il campo selezionato.
 	     * 
@@ -710,6 +776,7 @@ public class Apriori extends JApplet
 	     * Quindi il nuovo menù su cui andrò ad aggiungere tale campo, sarà quello riferito al bottone +
 	     * mostrando il menu che indica i valori degli attributi da poter aggiungere nella query
 	     */
+		
 	    if (button.getName().equals(SUB_BUTTON_ARULE))
 	    {
 	    	textField = window.associationRule;
@@ -726,32 +793,6 @@ public class Apriori extends JApplet
 	        		menu = menuConfident;
 	        	}
 	        		else	return;
-	    
-	    /*
-	     * ricavo la stringa nella query che è associata all'attributo selezionato nel menu, e lo rimuovo
-	     */
-	    
-	    //int index = Integer.parseInt(((JMenu)e.getSource()).getName());
-	    //textField.remove(index);
-
-	    /*[JTextField textField]
-	    String string = textField.getText();
-	    String attribute = "<" + ((JMenu)e.getSource()).getText() + ">=<";
-	    int startStrAttribute = string.indexOf(attribute);
-	    int endStrAttribute = string.indexOf('>', startStrAttribute + attribute.length()) + 1;
-	    String regularExpression = string.substring(startStrAttribute, endStrAttribute);
-	    if ((startStrAttribute != 0) || (endStrAttribute != string.length()))
-	    {
-	    	if (endStrAttribute == string.length())
-	    		regularExpression = " AND " + regularExpression;
-	    	else
-	    		regularExpression += " AND ";
-	    }
-	    textField.setText(string.replaceFirst(regularExpression, ""));
-	    */
-	    
-	    
-	    
 		/*
 		 * dal campo dell'attributo, rimetto la visibilità a tutti i valori ad esso associati, ed infine lo aggiungo al
 		 * menu associato al bottone + della barra. 
@@ -783,38 +824,10 @@ public class Apriori extends JApplet
 				}
 			}
 		}
-		/*
-	    for (MenuElement menuElement : menu.getSubElements())
-	    {
-	    	JMenu menuAttribute = (JMenu) menuElement;
-	    	int i = Integer.parseInt(menuAttribute.getName());
-	    	if (index < i)
-	    	{
-	    		textField.add(textField.getItem(i), i-1);
-	    		textField.remove(i);
-	    	}
-	    }
-	    */
-		/*
-		for (MenuElement menuElement : popupMenu.getSubElements())
-		{
-	    	JMenu menuAttribute = (JMenu) menuElement;
-	    	int i = Integer.parseInt(menuAttribute.getName());
-	    	if (index < i)
-	    	{
-	    		menuAttribute.setName(String.valueOf(i-1));
-	    	}
-		}
-		*/
 	}
 	
 	private void getRulesFromQuery ()
 	{
-		/*
-		MenuElement attributeMenuAss [] = queryAssociation.getSubElements();
-		MenuElement attributeMenuConfL [] = queryLeftConfident.getSubElements();
-		MenuElement attributeMenuConfR [] = queryRightConfident.getSubElements();
-		*/
 		try
 		{
 			writeObject(socket,4);
@@ -822,8 +835,22 @@ public class Apriori extends JApplet
 			sendQuery(queryLeftConfident, 'L');
 			sendQuery(queryRightConfident, 'R');
 			writeObject(socket,'E');
-			if (((String)readObject(socket)).equals("OK"))
+			String esito = (String)readObject(socket); 
+			if (esito.equals("OK"))
+			{
 				window.cpRuleFinder.rulesAreaTxt.setText((String)readObject(socket));
+				window.cpRuleFinder.msgAreaTxt.setText((String)readObject(socket));
+			}
+			else if (esito.equals("ERR"))
+			{
+				window.cpRuleFinder.rulesAreaTxt.setText("");
+				window.cpRuleFinder.msgAreaTxt.setText((String)readObject(socket));
+			}
+			else
+			{
+				window.cpRuleFinder.rulesAreaTxt.setText("");
+				window.cpRuleFinder.msgAreaTxt.setText("Messaggio non riconosciuto dal Client");
+			}
 		}
 		catch (IOException | ClassNotFoundException e)
 		{
@@ -854,13 +881,6 @@ public class Apriori extends JApplet
 				}
 			}
 		}
-		/*
-		else
-		{
-			writeObject(socket, type);
-			writeObject(socket, "NULL");
-		}
-		*/
 	}
 
 	private void Learning () 
@@ -869,10 +889,17 @@ public class Apriori extends JApplet
 		{
 			if (window.db.isSelected())
 			{	
-				writeObject (socket, 1);
-				writeObject (socket, window.nameDataTxt.getText());
-				writeObject(socket, Float.parseFloat(window.nameMinSupTxt.getText()));
-				writeObject (socket, Float.parseFloat(window.nameMinConfTxt.getText()));
+				if ((!window.nameDataTxt.getText().isEmpty())&&(!window.nameMinSupTxt.getText().isEmpty())&&(!window.nameMinConfTxt.getText().isEmpty())){
+					writeObject (socket, 1);
+					writeObject (socket, window.nameDataTxt.getText());
+					writeObject(socket, Float.parseFloat(window.nameMinSupTxt.getText()));
+					writeObject (socket, Float.parseFloat(window.nameMinConfTxt.getText()));
+				}
+				else {
+					window.cpRuleViewer.rulesAreaTxt.setText("");
+					window.cpRuleViewer.msgAreaTxt.setText("Assicurarsi di aver compilato i campi Data / min Sup / min Conf");
+					return;
+				}
 			}
 			else
 				writeObject (socket, 2);
@@ -913,7 +940,7 @@ public class Apriori extends JApplet
 
 	}
 	
-	public void PDFCreator () 
+	public void PDFCreator (JPanelRulesArea jPanel) 
 	{
 		JFileChooser request = new JFileChooser();
 		request.setFileFilter(new FileNameExtensionFilter("PDF Documents", "pdf"));
@@ -930,20 +957,19 @@ public class Apriori extends JApplet
 				PdfWriter.getInstance(document, new FileOutputStream(dest)); 
 				com.itextpdf.text.Rectangle two = new com.itextpdf.text.Rectangle(700,400);
 				document.open();
-				com.itextpdf.text.Paragraph p = new com.itextpdf.text.Paragraph(window.cpRuleViewer.rulesAreaTxt.getText());
+				com.itextpdf.text.Paragraph p = new com.itextpdf.text.Paragraph(jPanel.rulesAreaTxt.getText());
 				document.add(p);
 				document.setPageSize(two);
 				document.close();
-				window.cpRuleViewer.msgAreaTxt.setText(window.cpRuleViewer.msgAreaTxt.getText() + "\nFile PDF salvato con successo!");
+				jPanel.msgAreaTxt.setText(jPanel.msgAreaTxt.getText() + "\nFile PDF salvato con successo!");
 			}
 			catch (FileNotFoundException | DocumentException e) 
 			{
-				window.cpRuleViewer.msgAreaTxt.setText(window.cpRuleViewer.msgAreaTxt.getText() + "\nSi è verificato un errore durante la creazione del file PDF");
+				jPanel.msgAreaTxt.setText(jPanel.msgAreaTxt.getText() + "\nSi è verificato un errore durante la creazione del file PDF");
 			}
 		}
 	}
 	
-	//public static void main(String[] args)  
 	public void init()
 	{
 		String strHost = DEFAULT_HOST;
@@ -955,14 +981,10 @@ public class Apriori extends JApplet
 			
 			window = new Frame();
 			window.frame.setVisible(true);
-			//getContentPane().setLayout(new GridLayout(1, 1));
-			//getContentPane().add(window);
-			
 			InetAddress addr = InetAddress.getByName(strHost); // ottiene l'indirizzo dell'host specificato
 			System.out.println("Connecting to " + addr + "...");
 			socket = new Socket(addr, port); // prova a connetters
 			System.out.println("Success! Connected to " + socket);
-			//socket.close();
 		} 
 		catch (IOException e) 
 		{

@@ -21,6 +21,7 @@ import java.net.*;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeSet;
 import java.io.*;
 
@@ -31,7 +32,8 @@ import java.io.*;
 class ServerOneClient extends Thread 
 {
     private Socket socket;
-    private Data data;
+    //private Data data;
+    private List<Attribute> listAttribute;
     private AssociationRuleArchieve archive;
 
 
@@ -101,7 +103,9 @@ class ServerOneClient extends Thread
                         break;
                 }
                 
-            } catch (IOException | ClassNotFoundException e) {
+            } 
+            catch (IOException | ClassNotFoundException e) 
+            {
                 System.out.println(e.getMessage());
                 break;
             }
@@ -112,11 +116,15 @@ class ServerOneClient extends Thread
     {
     	try 
     	{
-    		for (int i = 0; i < data.getNumberOfAttributes() ; i++)
+    		Iterator it = listAttribute.iterator();
+    		//for (int i = 0; i < data.getNumberOfAttributes() ; i++)
+    		while (it.hasNext())
     		{ 
-    			if (data.getAttribute(i) instanceof DiscreteAttribute)
+    			Attribute attribute = (Attribute) it.next();
+    			//if (data.getAttribute(i) instanceof DiscreteAttribute)
+    			if (attribute instanceof DiscreteAttribute)
     			{
-    				DiscreteAttribute da =  (DiscreteAttribute) data.getAttribute(i);
+    				DiscreteAttribute da =  (DiscreteAttribute) attribute;
     				writeObject(socket, 'A');
     				writeObject(socket, da.getName());
     				writeObject(socket, da.getIndex());
@@ -128,20 +136,20 @@ class ServerOneClient extends Thread
     			}
     			else
     			{
-    				ContinuousAttribute ca = (ContinuousAttribute) data.getAttribute(i);
+    				ContinuousAttribute ca = (ContinuousAttribute) attribute;
     				writeObject(socket, 'A');
     				writeObject(socket, ca.getName());
     				writeObject(socket, ca.getIndex());
-    				Iterator<Float> it =  ca.iterator();
-    				if (it.hasNext())
+    				Iterator<Float> itCA =  ca.iterator();
+    				if (itCA.hasNext())
     				{
-    					float inf = it.next();
-    					while (it.hasNext())
+    					float inf = itCA.next();
+    					while (itCA.hasNext())
     					{
     						writeObject(socket, 'V');
-    						float sup = it.next();
+    						float sup = itCA.next();
     						//ContinuousItem item;
-    						if (it.hasNext())
+    						if (itCA.hasNext())
     							//item = new ContinuousItem ((ContinuousAttribute)currentAttribute, new Interval (inf,sup));
     							writeObject(socket, inf + "," + sup);
     						else
@@ -157,13 +165,7 @@ class ServerOneClient extends Thread
     	catch (IOException e) {
 			e.printStackTrace();
 		}
-    	
-    	catch (EmptySetException e)
-    	{
-    		
-    	}
     }
-    
     /**
      * @throws IOException 
      * @throws ClassNotFoundException 
@@ -171,7 +173,7 @@ class ServerOneClient extends Thread
      * @throws NoPatternException 
      * 
      */
-    private void sendRulesFromQuery (Socket socket)
+    private void sendRulesFromQuery (Socket socket) throws IOException
     {
     	try
     	{
@@ -181,18 +183,26 @@ class ServerOneClient extends Thread
     		char type = (char)readObject(socket); 
     		while(type != 'E')
     		{
+    			Attribute attribute = null;
+    			index = (int)readObject(socket);
+    			Iterator it = listAttribute.listIterator();
+    			while (it.hasNext())
+    			{
+    				attribute = (Attribute) it.next();
+    				if (attribute.getIndex() == index)
+    					break;
+    			}
     			switch (type)
     			{
     				case 'A':
-    					index = (int)readObject(socket);
-    					if (data.getAttribute(index) instanceof DiscreteAttribute)
+    					if (attribute instanceof DiscreteAttribute)
     					{
-    						DiscreteAttribute da = (DiscreteAttribute)data.getAttribute(index);
+    						DiscreteAttribute da = (DiscreteAttribute)attribute;
     						fpQuery.addItem(new DiscreteItem (da, (String)readObject(socket)));
     					}
     					else
     					{
-    						ContinuousAttribute ca = (ContinuousAttribute)data.getAttribute(index);
+    						ContinuousAttribute ca = (ContinuousAttribute)attribute;
     						String item = (String)readObject(socket);
     						float inf = Float.parseFloat(item.substring(0, item.indexOf(',')));
     						float sup = Float.parseFloat(item.substring(item.indexOf(',') + 1, item.length()));
@@ -201,16 +211,15 @@ class ServerOneClient extends Thread
     					break;
     					
     				case 'L':
-    					index = (int)readObject(socket);
-    					if (data.getAttribute(index) instanceof DiscreteAttribute)
+    					if (attribute instanceof DiscreteAttribute)
     					{
-    						DiscreteAttribute da = (DiscreteAttribute)data.getAttribute(index);
+    						DiscreteAttribute da = (DiscreteAttribute)attribute;
     						arQuery.addAntecedentItem(new DiscreteItem (da, (String)readObject(socket)));
     						//fpQuery.addItem(new DiscreteItem (da, (String)readObject(socket)));
     					}
     					else
     					{
-    						ContinuousAttribute ca = (ContinuousAttribute)data.getAttribute(index);
+    						ContinuousAttribute ca = (ContinuousAttribute)attribute;
     						String item = (String)readObject(socket);
     						float inf = Float.parseFloat(item.substring(0, item.indexOf(',')));
     						float sup = Float.parseFloat(item.substring(item.indexOf(',') + 1, item.length()));
@@ -220,16 +229,15 @@ class ServerOneClient extends Thread
     					break;
     					
     				case 'R':
-    					index = (int)readObject(socket);
-    					if (data.getAttribute(index) instanceof DiscreteAttribute)
+    					if (attribute instanceof DiscreteAttribute)
     					{
-    						DiscreteAttribute da = (DiscreteAttribute)data.getAttribute(index);
+    						DiscreteAttribute da = (DiscreteAttribute)attribute;
     						arQuery.addConsequentItem(new DiscreteItem (da, (String)readObject(socket)));
     						//fpQuery.addItem(new DiscreteItem (da, (String)readObject(socket)));
     					}
     					else
     					{
-    						ContinuousAttribute ca = (ContinuousAttribute)data.getAttribute(index);
+    						ContinuousAttribute ca = (ContinuousAttribute)attribute;
     						String item = (String)readObject(socket);
     						float inf = Float.parseFloat(item.substring(0, item.indexOf(',')));
     						float sup = Float.parseFloat(item.substring(item.indexOf(',') + 1, item.length()));
@@ -241,12 +249,28 @@ class ServerOneClient extends Thread
     			type = (char)readObject(socket); 
     		}
     		AssociationRuleArchieve subArchieve = archive.getSubArchieve(fpQuery,arQuery);
-    		writeObject(socket,"OK");
-    		writeObject(socket,subArchieve.toString());
+    		if (!subArchieve.isEmpty())
+    		{
+    			writeObject(socket,"OK");
+    			writeObject(socket,subArchieve.toString());
+    			writeObject(socket,"Ottenute le regole ricercate!");
+    		}
+    		else
+    		{
+    			writeObject(socket,"ERR");
+    			writeObject(socket,"La query inserita non è compresa in alcuna regola");
+    		}
     	}
-    	catch (ClassNotFoundException | IOException | EmptySetException e)
+    	catch (IOException | ClassNotFoundException e) 
     	{
-    		e.printStackTrace();
+			writeObject(socket,"ERR");
+			writeObject(socket, "Rilevato errore durante l'esecuzione : " + e.getMessage());
+    	}
+    	
+    	catch (NullPointerException e)
+    	{
+    		writeObject(socket,"ERR");
+			writeObject(socket, "Ricavare prima le regole nel panello 'MINING'");
     	}
     }
 
@@ -267,6 +291,10 @@ class ServerOneClient extends Thread
 	        	//Qualora, durante il caricamento del file, venga sollevata un'eccezione, molto probabilmente esso sarà provocata dal fatto che
 	        	//non vi sia alcun file con lo stesso nome di fileName.
 	        	archive = AssociationRuleArchieve.carica(fileName);
+	        	
+	            ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName + "Att.dmp"));
+	            listAttribute = (LinkedList<Attribute>) in.readObject();
+	            in.close();
 
 	        	String result = archive.toString();
 	        	writeObject(socket,"OK");
@@ -300,7 +328,7 @@ class ServerOneClient extends Thread
 			minSup = (float)readObject(socket);
 			minConf = (float)readObject(socket);
 			String fileName = (String)readObject(socket);
-			data = new Data(tableName);
+			Data data = new Data(tableName);
 			if ((minSup>0 && minSup<1) && (minConf>0 && minConf<1))
 			{
 				LinkedList<FrequentPattern> outputFP = FrequentPatternMiner.frequentPatternDiscovery(data,minSup);
@@ -338,10 +366,18 @@ class ServerOneClient extends Thread
 					writeObject(socket,"OK");
 					writeObject(socket, result);
 					writeObject(socket, "Ottenute le regole richieste!");
+					listAttribute = new LinkedList <Attribute>();
+					for (int i = 0; i < data.getNumberOfAttributes() ; i++){
+						listAttribute.add(data.getAttribute(i));
+					}
+					
+					ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName + "Att.dmp"));
+			        out.writeObject(listAttribute);
+			        out.close();
 				} 		
 				catch(Exception e)
 				{
-					writeObject(socket,"END");
+					writeObject(socket,"ERR");
 					writeObject(socket, e.getMessage());
 				}
 			}
