@@ -1,65 +1,53 @@
 package utility;
 
-public class Queue<T>
-{
+public class Queue<T> {
 
 		private Record<T> begin = null;
 
 		private Record<T> end = null;
 		
-		private class Record<T>
-		{
+		private class Record<T> {
 
 	 		public T elem;
 
 	 		public Record<T> next;
 
-			public Record (T e) 
-			{
+			public Record (T e) {
 				this.elem = e; 
 				this.next = null;
 			}
 		}
 		
 
-		public boolean isEmpty() 
-		{
+		public boolean isEmpty() {
 			return this.begin == null;
 		}
 
-		public void enqueue(T e) 
-		{
+		public void enqueue(T e) {
 			if (this.isEmpty())
 				this.begin = this.end = new Record<T>(e);
-			else 
-			{
+			else {
 				this.end.next = new Record<T>(e);
 				this.end = this.end.next;
 			}
 		}
 
 
-		public Object first() throws EmptyQueueException
-		{
+		public Object first() throws EmptyQueueException {
 			if (this.begin == null)
 				throw new EmptyQueueException("Errore, impossibile leggere la testa di una coda vuota");
 			return this.begin.elem;
 		}
 
-		public void dequeue() throws EmptyQueueException
-		{
-			if(this.begin==this.end)
-			{
+		public void dequeue() throws EmptyQueueException {
+			if(this.begin==this.end) {
 				if(this.begin==null)
 					throw new EmptyQueueException("Errore, impossibile cancellare la testa di una coda vuota");
 				else
 					this.begin=this.end=null;
 			}
-			else
-			{
+			else {
 				begin=begin.next;
-			}
-			
+			}	
 		}
-
 	}

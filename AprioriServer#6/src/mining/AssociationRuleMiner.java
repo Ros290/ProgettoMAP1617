@@ -20,13 +20,11 @@ import data.DiscreteAttribute;
 	 * @throws OneLevelPatternException 
 	 * @throws NoPatternException 
 	 */
-	public static LinkedList<AssociationRule> confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf) throws OneLevelPatternException, NoPatternException	
-	{
+	public static LinkedList<AssociationRule> confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf) throws OneLevelPatternException, NoPatternException	{
 		if (fp.getPatternLength()==1)
 			throw new OneLevelPatternException("Il pattern '"+fp.toString()+"' ha lunghezza 1\n");
 		LinkedList<AssociationRule> outputAR = new LinkedList<AssociationRule>();
-		for (int i=1; i < fp.getPatternLength(); i++)
-		{
+		for (int i=1; i < fp.getPatternLength(); i++){
 			AssociationRule AR = confidentAssociationRuleDiscovery(data,fp,minConf,i);
 			if (AR.getConfidence() >= minConf)
 				outputAR.add(AR);
@@ -46,8 +44,7 @@ import data.DiscreteAttribute;
 	 * @return regola d'associazione generata
 	 * @throws OneLevelPatternException 
 	 */
-	private static AssociationRule confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf, int iCut)
-	{
+	private static AssociationRule confidentAssociationRuleDiscovery(Data data,FrequentPattern fp,float minConf, int iCut){
 		
 		AssociationRule AR=new AssociationRule(fp.getSupport());
 	
@@ -68,27 +65,23 @@ import data.DiscreteAttribute;
  * @param AR regola d'associazione da cui generare la relativa confidenza
  * @return confidenza della regola d'associazione passata come parametro 
  */
-private static float  computeConfidence(Data data, AssociationRule AR)
-{
+private static float  computeConfidence(Data data, AssociationRule AR){
 	int totAntCount = 0;
 	int totAssCount = 0;
 	int antCount, assCount;
 	// indice esempio
-	for(int i=0;i<data.getNumberOfExamples();i++)
-	{
+	for(int i=0;i<data.getNumberOfExamples();i++){
 		//indice item
 		antCount = 0;
 		assCount = 0;
 		boolean isSupporting=true;
-		for(int j=0;j<AR.getAntecedentLenght();j++)
-		{
+		for(int j=0;j<AR.getAntecedentLenght();j++){
 			//DiscreteItem
 			Item item=(Item)AR.getAntecedentItem(j);
 			Attribute attribute=(Attribute)item.getAttribute();
 			//Extract the example value
 			Object valueInExample=data.getAttributeValue(i, attribute.getIndex());
-			if(!item.checkItemCondition(valueInExample))
-			{
+			if(!item.checkItemCondition(valueInExample)){
 				isSupporting=false;
 				break; //the ith example does not satisfy fp
 			}
@@ -98,15 +91,13 @@ private static float  computeConfidence(Data data, AssociationRule AR)
 			antCount++;
 		//isSupporting = true;
 		//assCount = antCount;
-		for(int j=0;j<AR.getConsequentLenght();j++)
-		{
+		for(int j=0;j<AR.getConsequentLenght();j++){
 			//DiscreteItem
 			Item item=(Item)AR.getConsequentItem(j);
 			Attribute attribute=(Attribute)item.getAttribute();
 			//Extract the example value
 			Object valueInExample=data.getAttributeValue(i, attribute.getIndex());
-			if(!item.checkItemCondition(valueInExample))
-			{
+			if(!item.checkItemCondition(valueInExample)){
 				isSupporting=false;
 				break; //the ith example does not satisfy fp
 			}

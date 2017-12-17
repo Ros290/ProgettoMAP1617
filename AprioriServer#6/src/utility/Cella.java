@@ -1,16 +1,13 @@
 package utility;
 
- class Cella 
- {
+ class Cella {
 		
-		Object elemento;
+	Object elemento;
 		
-		Puntatore successivo=null; 
+	Puntatore successivo=null; 
 
-		public Cella(Object e)
-		{
-			elemento = e;
-		}
-
+	public Cella(Object e){
+		elemento = e;
 	}
+}
 		

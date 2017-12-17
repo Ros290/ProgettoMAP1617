@@ -38,8 +38,19 @@ public abstract class Item implements Serializable
 		return this.value;
 	}
 	
+	
+	/**
+	 * Verifica che il valore passato corrisponda al valore assunto dall'item
+	 * @param value valore da confrontare
+	 * @return true se corrispondono, altrimenti false
+	 */
 	abstract boolean checkItemCondition(Object value);
 	
+	/**
+	 * Verifica se l'item passato come argomento corrisponde, sia come tipo e sia come valore, a quello in analisi
+	 * @param item item da confrontare
+	 * @return true se entrambi appartengono alla stessa sottoclasse, false altrimenti
+	 */
 	abstract boolean compareTo (Item item);
 	
 	public String toString()

@@ -2,13 +2,11 @@ package utility;
 
 
 
-public class Puntatore  
-{
+public class Puntatore  {
 	
 		public Cella link;
 		
-		public Puntatore(Cella c) 
-		{
+		public Puntatore(Cella c) {
 			link = c;
 		}
-	}
+}

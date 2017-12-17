@@ -11,22 +11,26 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 	float support;
 	private float confidence;
 	
-	/**
-	 * Costruttore della classe 
-	 * @param support valore di supporto
-	 */
 	
+	/**
+	 * Costruttore
+	 */
 	public AssociationRule ()
 	{
 		
 	}
 	
+	/**
+	 * Costruttore della classe 
+	 * @param support valore di supporto
+	 */
 	public AssociationRule (float support)
 	{
 		this.support = support;
 	}
 	
 	/**
+	 * ritorna il valore di supporto impostato per la regola di associazione
 	 * @return valore di supporto
 	 */
 	public float getSupport()
@@ -35,7 +39,7 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 	}
 	
 	/**
-	 * 
+	 * ritorna il valore di confidenza impostato per la regola di associazione
 	 * @return valore di confidenza
 	 */
 	public float getConfidence()
@@ -44,7 +48,7 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 	}
 	
 	/**
-	 * 
+	 * ritorna il numero di regole presenti nella parte antecedente della regola di associazione
 	 * @return numero di item nella parte "antecedente"
 	 */
 	public int getAntecedentLenght ()
@@ -53,7 +57,7 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 	}
 	
 	/**
-	 * 
+	 * ritorna il numero di regole presenti nella parte consequente della regola di associazione
 	 * @return numero di item nella parte "consequente"
 	 */
 	public int getConsequentLenght()
@@ -122,6 +126,10 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 		return antecedent[index];
 	}
 	
+	/**
+	 * imposta il valore di confidenza della regola di associazione 
+	 * @param confedence valore di confidenza
+	 */
 	public void setConfidence (float confedence)
 	{
 		this.confidence = confedence;
@@ -132,8 +140,19 @@ public class AssociationRule implements Comparable<AssociationRule>, Serializabl
 		return (this.confidence != AR.getConfidence()) == true ? 1 : -1;
 	}
 	
+	/**
+	 * Verifica che gli item presenti nella regola d'associazione passato come parametro ('AR') siano contenuti regola d'associazione in analisi.
+	 * Si può effettuare la ricerca per la parte "antecedente" o "consequente"
+	 * @param AR regola d'associazione da verificare
+	 * @param side indica quale "parte" delle regole di associazione bisogna verificare. 
+	 * Se 'L' -> antecedente;
+	 * Se 'R' -> consequente;
+	 * @return true se gli item di AR sono contenuti nella regola d'associazione, false altrimenti
+	 */
 	boolean isContained (AssociationRule AR,char side)
 	{
+		//verifica inanzitutto che il numero degli item presenti in AR siano AL MASSIMO pari a quelli presenti nella regola d'associazione in analisi
+		//qualora così non fosse, vorrà dire che, inevitabilmente, ci sarà almeno un item di AR che non sarà contenuto
 		if ((this.antecedent.length < AR.antecedent.length)||(this.consequent.length < AR.consequent.length))
 			return false;
 		Item [] arPattern;

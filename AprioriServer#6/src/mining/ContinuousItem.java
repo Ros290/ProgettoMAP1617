@@ -5,6 +5,11 @@ import data.ContinuousAttribute;
 public class ContinuousItem extends Item
 {
 
+	/**
+	 * Costruttore 
+	 * @param attribute attributo da associare 
+	 * @param value intervallo all'interno di cui dev'essere compreso il valore assunto dall'item
+	 */
 	public ContinuousItem(ContinuousAttribute attribute, Interval value) 
 	{
 		super(attribute, value);

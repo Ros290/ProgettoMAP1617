@@ -14,10 +14,7 @@ public class DiscreteItem extends Item
 	{
 		super (attribute,value);
 	}
-	
-	/**
-	 * Verifica che il valore passato corrisponda al valore assunto dall'item
-	 */
+
 	boolean checkItemCondition (Object value)
 	{
 		String value1 = ((String)this.getValue()).toLowerCase();
@@ -27,6 +24,7 @@ public class DiscreteItem extends Item
 		else return false;
 	}
 	
+
 	boolean compareTo (Item item)
 	{
 		if (item instanceof DiscreteItem)

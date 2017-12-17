@@ -512,15 +512,17 @@ public class Apriori extends JApplet
 	 *da ricercare. Inoltre, ad ogni nuova ricerca di mining effettuata, viene invocata questa funzione, riportando
 	 *i nuovi attributi-valori ottenuti dalla nuova ricerca
 	 */
+	@SuppressWarnings("deprecation")
 	private void getAttributesList (Socket socket) throws ClassNotFoundException, IOException
 	{
 		String string;
 		int index;
-		menuAssociation = new JPopupMenu();
-		menuConfident = new JPopupMenu();
-		queryAssociation = new JPopupMenu();
-		queryLeftConfident = new JPopupMenu();
-		queryRightConfident = new JPopupMenu();
+		menuAssociation = new JPopupMenu ();
+		menuConfident = new JPopupMenu ();
+		queryAssociation = new JPopupMenu ();
+		queryLeftConfident = new JPopupMenu ();
+		queryRightConfident = new JPopupMenu ();
+
 		char c = (char)readObject(socket);
 		/*
 		 *Ricava gli attributi e gli item associati ad essi dal server nel seguente formato:

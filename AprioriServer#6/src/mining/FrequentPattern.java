@@ -113,6 +113,8 @@ public class FrequentPattern implements Comparable, Serializable
 	 */
 	public boolean isContained(FrequentPattern fp)
 	{
+		//verifico inanzitutto che la lunghezza del pattern in analisi contenga un numero di elementi pari o inferiore rispetto a quelli presenti nel pattern passato come argomento
+		//qualora così non fosse, vuol dire che, inevitabilmente, 'fp' conterrà ALMENO una regola che non sarà presente nel pattern in analisi, pertanto 'fp' non vi è contenuto
 		if (this.getPatternLength() < fp.getPatternLength())
 			return false;
 		Iterator it = this.fp.iterator();
