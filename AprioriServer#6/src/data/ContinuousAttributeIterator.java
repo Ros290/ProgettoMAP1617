@@ -9,6 +9,12 @@ public class ContinuousAttributeIterator implements Iterator<Float> {
 	private int j=0;
 	private int numValues;
 	
+	/**
+	 * Costruttore 
+	 * @param min valore minimo dell'intervallo
+	 * @param max valore massimo dell'intervallo
+	 * @param numValues numero di sotto-intervalli (sempre compresi tra [min,max] ) 
+	 */
 	ContinuousAttributeIterator(float min,float max,int numValues){
 		this.min=min;
 		this.max=max;

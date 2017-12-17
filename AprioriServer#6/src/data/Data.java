@@ -20,6 +20,12 @@ public class Data
 	private List<Attribute> attributeSet = new LinkedList <Attribute>();
 	
 	
+	/**
+	 * Costruttore , permette l'acqusizione degli esempi riportati in una data tabella nel database
+	 * @param table nome della tabella da cui ricavare gli esempi
+	 * @throws SQLException
+	 * @throws DatabaseConnectionException
+	 */
 	public Data(String table) throws SQLException, DatabaseConnectionException
 	{
         this.data = new ArrayList<TupleData>();

@@ -144,6 +144,13 @@ public class Apriori extends JApplet
 			}
 		}
 		
+		/**
+		 * permette ad un JLabel di essere cliccato, in modo tale da mostrare un determinato messaggio.
+		 * Utile qualora si voglia descrivere un determinato campo
+		 * @param label il campo che deve contenere questa funzionalità
+		 * @param text titolo da impostare nel messaggio
+		 * @param descriptionText messaggio per esteso da mostrare
+		 */
 		public void setLabelDescription (JLabel label, String text, String descriptionText)
 		{
 			label.setText("<html><u>"+text+"</u></html>");
@@ -828,6 +835,9 @@ public class Apriori extends JApplet
 		}
 	}
 	
+	/**
+	 * Effettua la richiesta al server di ottenere le regole in base ai valori impostati nella sua ricerca
+	 */
 	private void getRulesFromQuery ()
 	{
 		try
@@ -860,22 +870,36 @@ public class Apriori extends JApplet
 		}
 	}
 	
+	/**
+	 * provvede ad analizzare, nel menu passato come parametro, quali sono stati le regole selezionate
+	 * in base anche al tipo di regole (regole di supporto o di confidenza (antecedenti o consequenti).
+	 * Dopo di che, provvede a mandare la richiesta al server.
+	 * @param menu menu da cui ricavare le regole selezionate
+	 * @param type descrive il tipo di regole quali devono essere inviate al server
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	private void sendQuery (JPopupMenu menu, char type) throws IOException, ClassNotFoundException
 	{
-		
+		//ricava tutti gli elementi presenti nel menu
 		MenuElement attributeMenu [] = menu.getSubElements();
+		//qualora non siano stati selezionate regole , semplicemente non manda la richiesta e termina la funzione. altrimenti continua
 		if (attributeMenu.length != 0)
 		{
 			for (MenuElement elementMenu : attributeMenu)
 			{
 				JMenu attribute = (JMenu)elementMenu;
 				MenuElement subPopupMenu [] = attribute.getSubElements();
+				//riporto in un vettore tutti i valori assumibili dall'attributo in analisi
 				MenuElement elementAttributeMenu[] = subPopupMenu[0].getSubElements();
 				for (MenuElement itemMenu : elementAttributeMenu)
 				{
+					//per ogni valore, verifico se esso sia stato selezionato (ovvero se ha nome = Y) o meno
 					JMenuItem item = (JMenuItem)itemMenu;
 					if (item.getName().equals("Y"))
 					{
+						//trovato il valore selezionato dell'attributo, provvedo a mandare la richiesta al server
+						//indicando il tipo della regola, l'indice associato all'attributo ed, infine, il valore ricercato
 						writeObject(socket, type);
 						writeObject(socket,Integer.parseInt(attribute.getName()));
 						writeObject(socket,item.getText());
@@ -885,10 +909,17 @@ public class Apriori extends JApplet
 		}
 	}
 
+	/**
+	 * provvede a mandare al server la richiesta di ottenere le regole, in base ai valori impostati
+	 * dopo di che, ricevuta la risposta, provvede a caricare i dati sulla schermata  
+	 */
 	private void Learning () 
 	{
 		try 
 		{
+			//in base alla richiesta, provvederà inanzitutto a mandare un numero intero al server, quale indicherà il tipo di operazione richiesto.
+			// se 1 -> indica che vuole acquisire le regole dal database
+			// se 2 -> indica che vuole acquisire le regole da un file 
 			if (window.db.isSelected())
 			{	
 				if ((!window.nameDataTxt.getText().isEmpty())&&(!window.nameMinSupTxt.getText().isEmpty())&&(!window.nameMinConfTxt.getText().isEmpty())){
@@ -905,6 +936,8 @@ public class Apriori extends JApplet
 			}
 			else
 				writeObject (socket, 2);
+			//per semplicità, qualora il client non abbia specificato un file su cui immettere le regole, il server provvederà comunque
+			//a salvarli in un file rinominato "map". ovviamente tale file verrà sovrascritto ad ogni nuova ricerca effettuata.
 			if (window.nameFileTxt.getText().isEmpty())
 				writeObject (socket, "map");
 			else
@@ -942,6 +975,11 @@ public class Apriori extends JApplet
 
 	}
 	
+	/**
+	 * provvedere a salvare le regole ottenute dal server in un file pdf (quale sarà depositato nel dispositivo del client attualmente in uso)
+	 * richiedendo, inoltre, dove depositarlo e il nome da affidargli
+	 * @param jPanel il pannello da cui prendere le regole che poi saranno riportate nel file pdf 
+	 */
 	public void PDFCreator (JPanelRulesArea jPanel) 
 	{
 		JFileChooser request = new JFileChooser();
@@ -976,11 +1014,8 @@ public class Apriori extends JApplet
 	{
 		String strHost = DEFAULT_HOST;
 		int port = DEFAULT_PORT;
-
-
 		try 
 		{
-			
 			window = new Frame();
 			window.frame.setVisible(true);
 			InetAddress addr = InetAddress.getByName(strHost); // ottiene l'indirizzo dell'host specificato
@@ -994,7 +1029,5 @@ public class Apriori extends JApplet
 			this.destroy();
 			System.exit(0);
 		}
-		
-
 	}
 }

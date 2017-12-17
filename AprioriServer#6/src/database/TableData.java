@@ -63,7 +63,12 @@ public class TableData
         this.db = db;
     }
 	
-
+    /**
+     * Restituisce una lista di Tuple (o esempi) presenti nella tabella specificata come parametro
+     * @param table nome della tabella da cui ricavare gli esempi
+     * @return lista di tuple (o esempi)
+     * @throws SQLException
+     */
 	public List<TupleData> getTransazioni(String table) throws SQLException{
 		LinkedList<TupleData> transSet = new LinkedList<TupleData>();
 		Statement statement;

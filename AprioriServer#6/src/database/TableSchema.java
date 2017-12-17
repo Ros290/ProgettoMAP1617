@@ -58,14 +58,8 @@ public class TableSchema {
 	        				 res.getString("COLUMN_NAME"),
 	        				 mapSQL_JAVATypes.get(res.getString("TYPE_NAME")))
 	        				 );
-	
-	         
-	         
 	      }
 	      res.close();
-	
-	
-	    
 	    }
 	  
 	
